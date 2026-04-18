@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COPA</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--olive:#4a5240;--olive-dark:#2e3328;--khaki:#8b8b5a;--sand:#c8b882;--red:#c0392b;--green:#27ae60;--bg:#1a1c16;--bg2:#22251c;--bg3:#2a2e22;--text:#d4cdb0;--dim:#7a7560;--border:#363a2c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--sand);letter-spacing:4px;display:flex;align-items:center;gap:10px}
+.logo-mark{width:26px;height:26px;border:2px solid var(--sand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.tabs{display:flex;gap:2px}
+.tab{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;background:transparent;border:1px solid transparent;color:var(--dim);cursor:pointer;transition:all .15s}
+.tab:hover{color:var(--text);border-color:var(--border)}
+.tab.active{background:var(--olive);color:var(--sand);border-color:var(--khaki)}
+.view{display:none;padding:24px;max-width:980px;margin:0 auto}
+.view.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:20px;margin-bottom:16px}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+label{display:block;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin:12px 0 5px}
+input,textarea,select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 11px;border-radius:3px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--khaki)}
+textarea{resize:vertical;min-height:60px}
+select option{background:var(--bg3)}
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;border:none;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--khaki);color:var(--bg)}.btn-primary:hover{background:var(--sand)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}.btn-ghost:hover{border-color:var(--khaki);color:var(--text)}
+.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red)}.btn-danger:hover{background:var(--red);color:white}
+.btn-sm{padding:5px 11px;font-size:.75rem}.btn-full{width:100%}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.grid-2{grid-template-columns:1fr}}
+.flex{display:flex}.gap-8{gap:8px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.row-item{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--khaki);border-radius:3px;padding:10px 14px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.row-info{flex:1}.row-name{font-weight:600;font-size:.9rem}
+.row-sub{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--khaki);margin-top:2px}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.opt-row{display:flex;gap:6px;align-items:center;margin-top:6px}
+.opt-lbl{font-family:'Share Tech Mono',monospace;color:var(--khaki);min-width:14px;font-size:.85rem}
+.radio-correct{accent-color:var(--green);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.q-block{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:14px;margin-bottom:12px}
+.q-block-title{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin-bottom:10px}
+.q-block label{font-size:.7rem}
+.q-block input,.q-block textarea{background:var(--bg2)}
+.p-hero{text-align:center;padding:28px 16px 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.p-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;letter-spacing:5px;text-transform:uppercase;color:var(--sand)}
+.p-hero p{color:var(--dim);font-size:.82rem;letter-spacing:1px;margin-top:4px}
+.center-box{max-width:420px;margin:0 auto}
+.big-timer{font-family:'Share Tech Mono',monospace;font-size:3rem;color:var(--sand);text-align:center;letter-spacing:8px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin:12px 0}
+.big-timer.urgent{color:#e74c3c;animation:blink .8s infinite}
+.big-timer.stopped{color:#e74c3c;animation:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.next-box{background:var(--olive-dark);border:2px solid var(--khaki);border-radius:4px;padding:16px 18px;margin-bottom:12px;text-align:center}
+.next-label{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.next-name{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:900;letter-spacing:2px;color:var(--sand);line-height:1.2}
+.prog-label{font-size:.75rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-outer{height:4px;background:var(--bg3);border-radius:2px}
+.prog-inner{height:4px;background:var(--khaki);border-radius:2px;transition:width .4s}
+.chip-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.chip{font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:3px 8px;border-radius:2px;border:1px solid var(--border);background:var(--bg3);color:var(--dim)}
+.chip.ok{border-color:var(--green);color:#2ecc71;background:rgba(39,174,96,.1)}
+.chip.ko{border-color:var(--red);color:#e74c3c;background:rgba(192,57,43,.08)}
+.chip.locked{border-color:var(--khaki);color:var(--sand)}
+.qcm-wrap{max-width:560px;margin:0 auto}
+.qcm-header{background:var(--olive-dark);border:1px solid var(--khaki);border-radius:3px 3px 0 0;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.qcm-header h2{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sand)}
+.qcm-body{background:var(--bg2);border:1px solid var(--khaki);border-top:none;border-radius:0 0 3px 3px;padding:20px}
+.q-text{font-size:.96rem;font-weight:600;line-height:1.5;margin-bottom:14px}
+.opt-choice{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid var(--border);border-radius:3px;margin-bottom:7px;cursor:pointer;background:var(--bg3);transition:all .12s}
+.opt-choice:hover{border-color:var(--khaki)}
+.opt-choice.sel{border-color:var(--sand);background:rgba(200,184,130,.07)}
+.opt-choice.ok{border-color:var(--green);background:rgba(39,174,96,.1);pointer-events:none}
+.opt-choice.ko{border-color:var(--red);background:rgba(192,57,43,.08);pointer-events:none}
+.opt-choice.locked{pointer-events:none}
+.opt-ltr2{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--khaki);min-width:18px}
+.feedback{padding:11px 14px;border-radius:3px;margin-top:12px;font-size:.85rem;font-weight:600;line-height:1.5}
+.feedback.ok{background:rgba(39,174,96,.12);border:1px solid var(--green);color:#2ecc71}
+.feedback.ko{background:rgba(192,57,43,.1);border:1px solid var(--red);color:#e74c3c}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px}
+.tag-wait{background:rgba(200,184,130,.12);color:var(--sand);border:1px solid var(--khaki)}
+.tag-ok{background:rgba(39,174,96,.15);color:#2ecc71;border:1px solid var(--green)}
+.tag-ko{background:rgba(192,57,43,.12);color:#e74c3c;border:1px solid var(--red)}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;margin-bottom:7px;flex-wrap:wrap}
+.lb-rank{font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--sand);min-width:28px}
+.lb-name{flex:1;font-weight:600;min-width:80px}
+.lb-score{font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--khaki)}
+.lb-time{font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--dim)}
+.live-row{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:12px 14px;margin-bottom:8px}
+.live-row.done{border-left:3px solid var(--green)}
+.live-row.stopped{border-left:3px solid var(--red)}
+.live-row.inprogress{border-left:3px solid var(--khaki)}
+.result-wrap{max-width:540px;margin:0 auto;text-align:center}
+.result-badge{font-family:'Share Tech Mono',monospace;font-size:4rem;color:var(--sand);line-height:1}
+.result-bar{margin:20px auto;height:6px;background:var(--bg3);border-radius:3px;max-width:300px}
+.result-bar-fill{height:6px;border-radius:3px;background:var(--khaki);transition:width 1s}
+.result-rows{text-align:left;margin-top:20px;border-top:1px solid var(--border)}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.86rem}
+.ico-ok{color:var(--green);font-weight:700}.ico-ko{color:var(--red);font-weight:700}.ico-skip{color:var(--dim)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--khaki);border-radius:4px;padding:24px;max-width:340px;width:100%;text-align:center}
+.modal h3{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sand);margin-bottom:6px}
+#admin-guard{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.guard-box{background:var(--bg2);border:1px solid var(--khaki);border-radius:4px;padding:32px;max-width:300px;width:90%;text-align:center}
+.guard-box h2{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--sand);margin-bottom:16px}
+.guard-box input{margin-bottom:12px;text-align:center;letter-spacing:4px}
+.err-msg{color:#e74c3c;font-size:.78rem;margin-top:8px}
+.code-card{background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:16px;margin-bottom:12px}
+#qr-out{display:flex;justify-content:center;margin:12px 0}
+#qr-out canvas,#qr-out img{border:6px solid white;border-radius:4px}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--khaki);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-full{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;color:var(--dim);font-size:.9rem}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--olive);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="app-loading" class="loading-full">
+  <div class="spinner"></div>
+  <div>Connexion a Firebase...</div>
+</div>
+
+<div id="app-root" style="display:none">
+<header>
+  <div class="logo"><div class="logo-mark">+</div> COPA</div>
+  <div class="tabs">
+    <button class="tab active" id="tab-admin" onclick="nav('admin',this)">ADMIN</button>
+    <button class="tab" id="tab-participant" onclick="nav('participant',this)">PARTICIPANT</button>
+  </div>
+</header>
+
+<div id="view-admin" class="view active">
+  <div id="admin-guard">
+    <div class="guard-box">
+      <h2>Acces Admin</h2>
+      <input type="password" id="admin-pwd-inp" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPwd()">
+      <button class="btn btn-primary btn-full" onclick="checkPwd()">ENTRER</button>
+      <div class="err-msg" id="pwd-err"></div>
+    </div>
+  </div>
+  <div id="admin-content" style="display:none">
+    <div class="flex gap-8 mt-8" style="margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="subNav('postes')">Postes</button>
+      <button class="btn btn-ghost btn-sm" onclick="subNav('joueurs')">Joueurs</button>
+      <button class="btn btn-ghost btn-sm" onclick="subNav('leaderboard')">Classement</button>
+      <button class="btn btn-ghost btn-sm" onclick="subNav('config')">Config</button>
+      <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="adminLogout()">Deconnexion</button>
+    </div>
+
+    <div id="sub-postes">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <div class="card-title">Postes (10 requis - n10 = final commun)</div>
+            <div id="postes-list"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title" id="form-title">Nouveau poste</div>
+            <label>N de poste (1-10)</label>
+            <input type="number" id="f-num" min="1" max="10" placeholder="1" oninput="onNumChange()">
+            <div id="final-warning" style="display:none;font-size:.75rem;color:var(--sand);margin-top:4px">Poste 10 = point final commun</div>
+            <label>Nom</label>
+            <input id="f-name" placeholder="Ex : Crete Nord">
+            <label>Code balise</label>
+            <div class="flex gap-8">
+              <input id="f-code" placeholder="C01" style="font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-transform:uppercase">
+              <button class="btn btn-ghost btn-sm" onclick="autoCode()">AUTO</button>
+            </div>
+            <label>Position de la balise sur la carte</label>
+            <div style="font-size:.72rem;color:var(--dim);margin-bottom:6px">Cliquez sur la carte pour placer la balise.</div>
+            <div id="admin-map" style="height:240px;border-radius:4px;overflow:hidden;border:1px solid var(--border);cursor:crosshair"></div>
+            <div id="admin-map-coords" style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--khaki);margin-top:4px">Aucune position selectionnee</div>
+            <input type="hidden" id="f-lat">
+            <input type="hidden" id="f-lng">
+            <div id="questions-builder" class="mt-12"></div>
+              <button class="btn btn-primary" onclick="savePoste()">Enregistrer</button>
+              <button class="btn btn-ghost" onclick="resetForm()">Annuler</button>
+            </div>
+            <input type="hidden" id="editing-id" value="">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sub-joueurs" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Joueurs autorises</div>
+          <div id="joueurs-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ajouter un joueur</div>
+          <label>Pseudo</label>
+          <input id="j-pseudo" placeholder="Ex : LECLERC" onkeydown="if(event.key==='Enter')addJoueur()">
+          <label>Rotation</label>
+          <select id="j-order">
+            <option value="0">Rotation 1</option><option value="1">Rotation 2</option>
+            <option value="2">Rotation 3</option><option value="3">Rotation 4</option>
+            <option value="4">Rotation 5</option><option value="5">Rotation 6</option>
+            <option value="6">Rotation 7</option><option value="7">Rotation 8</option>
+            <option value="8">Rotation 9</option>
+          </select>
+          <div style="font-size:.73rem;color:var(--dim);margin-top:6px">Determine l'ordre des postes 1-9. Poste 10 identique pour tous.</div>
+          <button class="btn btn-primary mt-12 btn-full" onclick="addJoueur()">AJOUTER</button>
+          <button class="btn btn-ghost btn-sm mt-8" onclick="genPseudo()">Pseudo aleatoire</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sub-leaderboard" style="display:none">
+      <div class="card">
+        <div class="card-title">Suivi GPS en temps reel</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <button class="btn btn-ghost btn-sm" id="map-refresh-btn" onclick="refreshMapNow()">Actualiser (prochain: 30s)</button>
+          <div style="font-size:.72rem;color:var(--green)">● Rafraichissement auto actif</div>
+        </div>
+        <div id="map-container" style="height:420px;border-radius:4px;overflow:hidden;border:1px solid var(--border);margin-bottom:8px"></div>
+        <div id="map-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px"></div>
+        <div style="font-size:.7rem;color:var(--dim)">Position mise a jour toutes les 30 secondes. Precision dependante du signal GPS.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Suivi en temps reel</div>
+        <button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="loadLive()">Actualiser</button>
+        <div id="live-list"><div style="color:var(--dim);font-size:.85rem">Cliquez sur Actualiser.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Arreter le chrono d'un participant</div>
+        <div style="font-size:.78rem;color:var(--dim);margin-bottom:10px">Gele le chronometre et enregistre le temps ajuste.</div>
+        <div id="stop-list"><div style="color:var(--dim);font-size:.85rem">Cliquez sur Actualiser ci-dessus.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Classement final</div>
+        <button class="btn btn-ghost btn-sm" style="margin-bottom:12px" onclick="loadLB()">Actualiser</button>
+        <div id="lb-list"></div>
+        <button class="btn btn-danger btn-sm mt-12" onclick="resetAll()">Reinitialiser tous les resultats</button>
+      </div>
+    </div>
+
+    <div id="sub-config" style="display:none">
+      <div class="card">
+        <div class="card-title">Parametres</div>
+        <label>Nom de la course</label><input id="cfg-name">
+        <label>Unite</label><input id="cfg-unit">
+        <label>Duree du chrono (minutes)</label><input type="number" id="cfg-duration" min="1" max="480">
+        <label>URL GitHub Pages</label>
+        <input id="cfg-siteurl" placeholder="https://sampey33.github.io/CO-CHARLIE/">
+        <label>Nouveau mot de passe admin</label>
+        <input type="password" id="cfg-pwd" placeholder="Laisser vide = inchange">
+        <button class="btn btn-primary mt-12" onclick="saveConfig()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="view-participant" class="view">
+  <div class="p-hero">
+    <h1 id="ph-name">COPA</h1>
+    <p id="ph-unit">Connectez-vous pour commencer</p>
+  </div>
+  <div id="s-login">
+    <div class="center-box">
+      <div id="login-loading" style="display:none;text-align:center;padding:20px;color:var(--dim)">
+        <div class="spinner"></div> Connexion...
+      </div>
+      <div id="login-form">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:20px;text-align:center;margin-bottom:16px">
+          <div style="font-size:2.2rem;margin-bottom:8px">QR</div>
+          <div style="font-weight:600;margin-bottom:4px">Scannez votre QR code personnel</div>
+          <div style="color:var(--dim);font-size:.82rem">L'admin vous remet votre QR code avant le depart</div>
+        </div>
+        <div style="text-align:center;color:var(--dim);font-size:.8rem;margin:12px 0">ou saisissez manuellement</div>
+        <input id="p-name-inp" placeholder="Votre pseudo" style="text-transform:uppercase;text-align:center;margin-bottom:12px" onkeydown="if(event.key==='Enter')doLogin(this.value)">
+        <button class="btn btn-primary btn-full" onclick="doLogin(document.getElementById('p-name-inp').value)">COMMENCER</button>
+        <div class="err-msg mt-8" id="login-err"></div>
+      </div>
+    </div>
+  </div>
+  <div id="s-scan" style="display:none">
+    <div style="max-width:480px;margin:0 auto">
+      <div class="big-timer" id="p-timer">--:--:--</div>
+      <div class="flex gap-8" style="align-items:center;margin-bottom:12px">
+        <div style="flex:1;font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--sand)" id="scan-name-disp">-</div>
+        <span id="scan-tag" class="tag tag-wait">0 / 10</span>
+      </div>
+      <!-- Tabs carte / saisie -->
+      <div class="flex gap-8" style="margin-bottom:12px">
+        <button class="btn btn-primary btn-sm" id="tab-map-btn" onclick="switchScanTab('map')">Carte</button>
+        <button class="btn btn-ghost btn-sm" id="tab-code-btn" onclick="switchScanTab('code')">Saisir code</button>
+      </div>
+      <!-- VUE CARTE -->
+      <div id="scan-map-view">
+        <!-- Direction / distance -->
+        <div id="nav-banner" style="display:none;background:var(--olive-dark);border:1px solid var(--khaki);border-radius:4px;padding:12px 16px;margin-bottom:10px;text-align:center">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Prochain poste</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;color:var(--sand)" id="nav-name">-</div>
+          <div class="flex gap-8" style="justify-content:center;margin-top:8px">
+            <div style="text-align:center">
+              <div style="font-size:2rem" id="nav-arrow">-</div>
+              <div style="font-size:.72rem;color:var(--dim)">Direction</div>
+            </div>
+            <div style="text-align:center;padding:0 16px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:1.4rem;color:var(--sand)" id="nav-dist">-</div>
+              <div style="font-size:.72rem;color:var(--dim)">Distance</div>
+            </div>
+          </div>
+        </div>
+        <!-- Carte participant -->
+        <div id="p-map" style="height:340px;border-radius:4px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px"></div>
+        <div style="font-size:.7rem;color:var(--dim);margin-bottom:12px;text-align:center">Point bleu = votre position. Triangle = prochaine balise.</div>
+      </div>
+      <!-- VUE SAISIE CODE -->
+      <div id="scan-code-view" style="display:none">
+        <div class="next-box">
+          <div class="next-label">Prochain poste</div>
+          <div class="next-name" id="next-poste-info">-</div>
+        </div>
+        <div class="code-card">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin-bottom:10px">Saisir le code de la balise</div>
+          <div class="flex gap-8">
+            <input id="manual-code-inp" placeholder="Ex : C01" style="font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-transform:uppercase" onkeydown="if(event.key==='Enter')submitManual()">
+            <button class="btn btn-primary" onclick="submitManual()">OK</button>
+          </div>
+          <div class="err-msg mt-8" id="scan-err"></div>
+        </div>
+      </div>
+      <div class="prog-label"><span>PROGRESSION</span><span id="prog-txt">0 / 10</span></div>
+      <div class="prog-outer"><div class="prog-inner" id="prog-bar" style="width:0%"></div></div>
+      <div class="chip-list" id="chip-list"></div>
+    </div>
+  </div>
+  <div id="s-qcm" style="display:none">
+    <div class="qcm-wrap">
+      <div class="qcm-header">
+        <h2>POSTE <span id="qn"></span> - <span id="qname"></span></h2>
+        <div class="flex gap-8" style="align-items:center">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--sand)" id="qcm-timer-disp">-</div>
+          <span id="qtag" class="tag tag-wait">EN COURS</span>
+        </div>
+      </div>
+      <div class="qcm-body">
+        <div class="q-text" id="q-text"></div>
+        <div id="q-opts"></div>
+        <div id="q-feedback" style="display:none"></div>
+        <div class="mt-16" id="q-submit"><button class="btn btn-primary" onclick="submitAnswer()">VALIDER</button></div>
+        <div class="mt-12" id="q-next" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+  <div id="s-result" style="display:none">
+    <div class="result-wrap">
+      <div class="result-badge" id="r-score"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--khaki);margin-top:8px" id="r-time"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--dim);margin-top:4px" id="r-bonus"></div>
+      <div style="font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-top:6px" id="r-mention"></div>
+      <div class="result-bar"><div class="result-bar-fill" id="r-bar" style="width:0%"></div></div>
+      <div class="result-rows" id="r-rows"></div>
+      <button class="btn btn-ghost mt-24" onclick="restart()">Nouvelle session</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="qr-overlay">
+  <div class="modal">
+    <h3 id="qr-modal-title">QR CODE JOUEUR</h3>
+    <div style="color:var(--dim);font-size:.78rem;margin-bottom:4px" id="qr-modal-sub"></div>
+    <div id="qr-out"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--khaki);word-break:break-all;margin-top:4px" id="qr-url-display"></div>
+    <div style="font-size:.7rem;color:var(--dim);margin-top:8px;font-style:italic">Imprimez et remettez ce QR au participant.</div>
+    <button class="btn btn-ghost btn-sm mt-12" onclick="closeQR()">Fermer</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+/* Leaflet CSS */
+var leafletCSS = document.createElement("link");
+leafletCSS.rel = "stylesheet";
+leafletCSS.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+document.head.appendChild(leafletCSS);
+
+var FBAPP = initializeApp({
+  apiKey: "AIzaSyAeEkqBZefQYjPChESHv_fJ692P2A494wo",
+  authDomain: "charlie-co.firebaseapp.com",
+  projectId: "charlie-co",
+  storageBucket: "charlie-co.firebasestorage.app",
+  messagingSenderId: "569262898500",
+  appId: "1:569262898500:web:5852e2aafd05ad4e89eb11"
+});
+var DB = getFirestore(FBAPP);
+
+function rCfg()        { return doc(DB, "ot", "config"); }
+function rPoste(id)    { return doc(DB, "ot_postes", id); }
+function rJoueur(id)   { return doc(DB, "ot_joueurs", id); }
+function rProg(pseudo) { return doc(DB, "ot_progress", pseudo); }
+function cPostes()     { return collection(DB, "ot_postes"); }
+function cJoueurs()    { return collection(DB, "ot_joueurs"); }
+function cSessions()   { return collection(DB, "ot_sessions"); }
+function cProgress()   { return collection(DB, "ot_progress"); }
+
+/* ── ETAT GLOBAL ── */
+var CFG = {name:"COPA", unit:"Section 2 — Peloton Eclaireur", duration:120, pwd:"admin1234", siteUrl:"https://sampey33.github.io/CO-CHARLIE/"};
+var postes = [], joueurs = [], sessions = [];
+
+/*
+  Structure de progression participant :
+  - pPostes : { numPoste: { done: bool, questions: [bool, bool, bool] } }
+    ex: { 1: { done: true, questions: [true, false, true] }, 3: { done: false } }
+  - pBonus  : nombre de secondes de bonus accumule (positif = temps reduit)
+*/
+var pJoueur = null;
+var pPostes = {};   // { numPoste: { done: bool, questions: [bool,...] } }
+var pBonus  = 0;    // secondes de bonus/malus
+var pStartTime = null, pElapsed = null;
+var pTimerInterval = null, pVisualInterval = null;
+var pSelOpt = null, pCurrentPoste = null, pQuestions = [], pQIdx = 0;
+var qOptIdx = {};
+
+/* ── FIREBASE ── */
+async function fbLoadAll() {
+  try { var s = await getDoc(rCfg()); if (s.exists()) Object.assign(CFG, s.data()); } catch(e) {}
+  postes = [];
+  try {
+    var ps = await getDocs(cPostes());
+    ps.forEach(function(d) { postes.push(Object.assign({id:d.id}, d.data())); });
+    postes.sort(function(a,b) { return a.num - b.num; });
+  } catch(e) {}
+  joueurs = [];
+  try {
+    var js = await getDocs(cJoueurs());
+    js.forEach(function(d) { joueurs.push(Object.assign({id:d.id}, d.data())); });
+  } catch(e) {}
+}
+async function fbSet(ref, data) { try { await setDoc(ref, data); } catch(e) { console.error(e); } }
+async function fbDel(ref)       { try { await deleteDoc(ref); }  catch(e) { console.error(e); } }
+async function fbAdd(col, data) { try { await addDoc(col, data); } catch(e) { console.error(e); } }
+async function fbLoadSessions() {
+  sessions = [];
+  try {
+    var ss = await getDocs(cSessions());
+    ss.forEach(function(d) { sessions.push(Object.assign({id:d.id}, d.data())); });
+  } catch(e) {}
+}
+async function fbLoadProgress() {
+  var list = [];
+  try {
+    var ps = await getDocs(cProgress());
+    ps.forEach(function(d) { list.push(d.data()); });
+  } catch(e) {}
+  return list;
+}
+
+/* Sauvegarde la progression du participant vers Firebase */
+function buildProgressSnap() {
+  /* On construit un objet plat pour Firebase :
+     validated[numPoste] = true/false/null
+     true  = poste complete avec au moins une bonne reponse
+     false = poste complete mais aucune bonne reponse
+     absent = pas encore fait */
+  var validated = {};
+  var numPostes = Object.keys(pPostes);
+  for (var i = 0; i < numPostes.length; i++) {
+    var num = numPostes[i];
+    var entry = pPostes[num];
+    if (entry.done) {
+      /* true si toutes les questions correctes, false sinon */
+      var allOk = entry.questions.every(function(v) { return v === true; });
+      validated[num] = allOk;
+    }
+  }
+  return validated;
+}
+
+async function saveProgress(finalElapsed) {
+  var validated = buildProgressSnap();
+  var rawNow = Math.floor((Date.now() - pStartTime) / 1000);
+  var adjusted = Math.max(0, rawNow - pBonus);
+  var detail = {};
+  Object.keys(pPostes).forEach(function(num) {
+    detail[num] = pPostes[num].questions || [];
+  });
+  await fbSet(rProg(pJoueur.pseudo), {
+    pseudo: pJoueur.pseudo,
+    validated: validated,
+    detail: detail,
+    bonus: pBonus,
+    elapsed: finalElapsed !== undefined ? finalElapsed : null,
+    elapsedRaw: finalElapsed !== undefined ? finalElapsed + pBonus : null,
+    startTime: pStartTime,
+    updatedAt: new Date().toISOString(),
+    stopped: false
+  });
+}
+
+/* ── ADMIN AUTH ── */
+window.checkPwd = function() {
+  if (document.getElementById("admin-pwd-inp").value === CFG.pwd) {
+    document.getElementById("admin-guard").style.display = "none";
+    document.getElementById("admin-content").style.display = "block";
+    syncCfg(); renderAll();
+  } else {
+    document.getElementById("pwd-err").textContent = "Mot de passe incorrect.";
+  }
+};
+window.adminLogout = function() {
+  document.getElementById("admin-guard").style.display = "flex";
+  document.getElementById("admin-content").style.display = "none";
+  document.getElementById("admin-pwd-inp").value = "";
+  document.getElementById("pwd-err").textContent = "";
+};
+window.saveConfig = async function() {
+  var n = document.getElementById("cfg-name").value; if (n) CFG.name = n;
+  var u = document.getElementById("cfg-unit").value; if (u) CFG.unit = u;
+  var d = parseInt(document.getElementById("cfg-duration").value); if (d) CFG.duration = d;
+  var s = document.getElementById("cfg-siteurl").value.trim(); if (s) CFG.siteUrl = s;
+  var p = document.getElementById("cfg-pwd").value; if (p) CFG.pwd = p;
+  await fbSet(rCfg(), CFG);
+  alert("Configuration enregistree.");
+};
+function syncCfg() {
+  document.getElementById("cfg-name").value = CFG.name;
+  document.getElementById("cfg-unit").value = CFG.unit;
+  document.getElementById("cfg-duration").value = CFG.duration;
+  document.getElementById("cfg-siteurl").value = CFG.siteUrl || "";
+}
+
+/* ── NAV ── */
+window.nav = function(v, btn) {
+  document.querySelectorAll(".view").forEach(function(e) { e.classList.remove("active"); });
+  document.querySelectorAll(".tab").forEach(function(e) { e.classList.remove("active"); });
+  document.getElementById("view-" + v).classList.add("active");
+  btn.classList.add("active");
+  if (v === "participant") {
+    document.getElementById("ph-name").textContent = CFG.name;
+    document.getElementById("ph-unit").textContent = CFG.unit;
+    document.getElementById("p-timer").textContent = fmtTime(CFG.duration * 60);
+  }
+};
+var subViews = ["postes","joueurs","leaderboard","config"];
+window.subNav = function(v) {
+  subViews.forEach(function(s) {
+    var el = document.getElementById("sub-" + s);
+    if (el) el.style.display = (s === v) ? "block" : "none";
+  });
+  if (v === "leaderboard") {
+    loadLive(); startMapRefresh();
+  } else if (v === "postes") {
+    setTimeout(function() { initAdminMap(); }, 300);
+    stopMapRefresh();
+  } else {
+    stopMapRefresh();
+  }
+};
+
+function startMapRefresh() {
+  stopMapRefresh();
+  mapRefreshInterval = setInterval(async function() {
+    var gpsData = await loadGPSData();
+    await initMap(gpsData);
+    updateMapTimer();
+  }, 30000);
+  updateMapTimer();
+}
+function stopMapRefresh() {
+  clearInterval(mapRefreshInterval);
+  mapRefreshInterval = null;
+}
+var mapTimerCount = 30;
+var mapTimerInterval = null;
+function updateMapTimer() {
+  mapTimerCount = 30;
+  clearInterval(mapTimerInterval);
+  var btn = document.getElementById("map-refresh-btn");
+  mapTimerInterval = setInterval(function() {
+    mapTimerCount--;
+    if (btn) btn.textContent = "Actualiser (prochain: " + mapTimerCount + "s)";
+    if (mapTimerCount <= 0) {
+      mapTimerCount = 30;
+      if (btn) btn.textContent = "Actualiser (prochain: 30s)";
+    }
+  }, 1000);
+}
+
+/* ── QUESTIONS BUILDER ── */
+window.onNumChange = function() {
+  var val = document.getElementById("f-num").value;
+  document.getElementById("final-warning").style.display = (val === "10") ? "block" : "none";
+  buildQuestionsUI(val === "10", null);
+};
+window.autoCode = function() {
+  var n = document.getElementById("f-num").value || "0";
+  document.getElementById("f-code").value = "C" + String(parseInt(n)).padStart(2, "0");
+};
+function buildQuestionsUI(isFinal, existing) {
+  var count = isFinal ? 1 : 3;
+  var container = document.getElementById("questions-builder");
+  container.innerHTML = "";
+  qOptIdx = {};
+  for (var qi = 0; qi < count; qi++) {
+    var q = (existing && existing[qi]) ? existing[qi] : {};
+    var block = document.createElement("div");
+    block.className = "q-block";
+    block.id = "qblock-" + qi;
+    var titleHtml = count > 1 ? '<div class="q-block-title">Question ' + (qi+1) + " / " + count + "</div>" : "";
+    var qval = q.question || "";
+    var eval2 = q.explication || "";
+    block.innerHTML = titleHtml
+      + '<label>Question</label>'
+      + '<textarea id="fq-' + qi + '" placeholder="Redigez la question...">' + qval + '</textarea>'
+      + '<label>Options (cochez la bonne reponse)</label>'
+      + '<div id="ob-' + qi + '"></div>'
+      + '<button class="btn btn-ghost btn-sm mt-8" onclick="addOptQ(' + qi + ')">+ Option</button>'
+      + '<label>Explication</label>'
+      + '<textarea id="fe-' + qi + '" placeholder="Explication de la bonne reponse...">' + eval2 + '</textarea>';
+    container.appendChild(block);
+    qOptIdx[qi] = 0;
+    var opts = (q.options && q.options.length) ? q.options : [{},{},{},{}];
+    for (var oi = 0; oi < opts.length; oi++) { addOptQData(qi, opts[oi]); }
+  }
+}
+function addOptQData(qi, data) {
+  var i = qOptIdx[qi]++;
+  var L = "ABCDEFGH";
+  var ob = document.getElementById("ob-" + qi);
+  if (!ob) return;
+  var count = ob.children.length;
+  var d = document.createElement("div");
+  d.className = "opt-row"; d.id = "orow-" + qi + "-" + i;
+  var txt = (data && data.text) ? data.text : "";
+  var chk = (data && data.correct) ? "checked" : "";
+  d.innerHTML = '<span class="opt-lbl">' + L[count] + '</span>'
+    + '<input type="text" id="ot-' + qi + "-" + i + '" placeholder="Option" value="' + txt + '" style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:Barlow,sans-serif;font-size:.9rem;padding:8px 11px;border-radius:3px;outline:none">'
+    + '<input type="radio" name="correct-' + qi + '" class="radio-correct" id="or-' + qi + "-" + i + '" ' + chk + '>'
+    + '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">x</button>';
+  ob.appendChild(d);
+}
+window.addOptQ = function(qi) {
+  if (qOptIdx[qi] === undefined) qOptIdx[qi] = 0;
+  addOptQData(qi, {});
+};
+function getOptsQ(qi) {
+  var result = [];
+  var ob = document.getElementById("ob-" + qi);
+  if (!ob) return result;
+  var rows = ob.querySelectorAll('[id^="orow-' + qi + '-"]');
+  rows.forEach(function(r) {
+    var parts = r.id.split("-"); var i = parts[parts.length-1];
+    var t = document.getElementById("ot-" + qi + "-" + i);
+    var c = document.getElementById("or-" + qi + "-" + i);
+    if (t && t.value.trim()) result.push({text:t.value.trim(), correct: c ? c.checked : false});
+  });
+  return result;
+}
+function getAllQuestions(isFinal) {
+  var count = isFinal ? 1 : 3;
+  var questions = [];
+  for (var qi = 0; qi < count; qi++) {
+    var qel = document.getElementById("fq-" + qi);
+    var eel = document.getElementById("fe-" + qi);
+    var opts = getOptsQ(qi);
+    questions.push({question: qel ? qel.value.trim() : "", explication: eel ? eel.value.trim() : "", options: opts});
+  }
+  return questions;
+}
+
+/* ── POSTES CRUD ── */
+window.savePoste = async function() {
+  var num = parseInt(document.getElementById("f-num").value);
+  var name = document.getElementById("f-name").value.trim();
+  var code = document.getElementById("f-code").value.trim().toUpperCase();
+  var eid = document.getElementById("editing-id").value;
+  var isFinal = (num === 10);
+  if (!num || num < 1 || num > 10 || !name || !code) { alert("Remplissez le numero, le nom et le code."); return; }
+  if (postes.find(function(p) { return p.code === code && p.id !== eid; })) { alert("Code deja utilise."); return; }
+  if (postes.find(function(p) { return p.num === num && p.id !== eid; })) { alert("Numero de poste deja utilise."); return; }
+  var questions = getAllQuestions(isFinal);
+  for (var qi = 0; qi < questions.length; qi++) {
+    var q = questions[qi];
+    if (!q.question || q.options.length < 2) { alert("Remplissez toutes les questions (min 2 options)."); return; }
+    if (!q.options.some(function(o) { return o.correct; })) { alert("Cochez la bonne reponse pour la question " + (qi+1) + "."); return; }
+  }
+  var lat = parseFloat(document.getElementById("f-lat").value) || null;
+  var lng = parseFloat(document.getElementById("f-lng").value) || null;
+  var id = eid || Math.random().toString(36).slice(2);
+  var p = {id:id, num:num, name:name, code:code, questions:questions, isFinal:isFinal, lat:lat, lng:lng};
+  await fbSet(rPoste(id), p);
+  if (eid) { var idx = postes.findIndex(function(x) { return x.id === eid; }); postes[idx] = p; }
+  else postes.push(p);
+  postes.sort(function(a,b) { return a.num - b.num; });
+  renderPostes(); resetForm();
+};
+function renderPostes() {
+  var el = document.getElementById("postes-list");
+  if (!postes.length) { el.innerHTML = '<div style="color:var(--dim);font-size:.85rem;padding:8px 0">Aucun poste.</div>'; return; }
+  var html = "";
+  postes.forEach(function(p) {
+    html += '<div class="row-item">';
+    html += '<div style="font-family:Share Tech Mono,monospace;color:var(--sand);min-width:28px">' + String(p.num).padStart(2,"0") + "</div>";
+    html += '<div class="row-info"><div class="row-name">' + p.name;
+    if (p.isFinal) html += ' <span style="font-size:.65rem;background:rgba(200,184,130,.12);border:1px solid var(--khaki);border-radius:2px;padding:1px 6px;color:var(--sand)">FINAL</span>';
+    html += '</div><div class="row-sub">' + p.code + "</div></div>";
+    html += '<div class="row-actions">';
+    html += '<button class="btn btn-ghost btn-sm" onclick="editPoste(\'' + p.id + '\')">Modifier</button>';
+    html += '<button class="btn btn-danger btn-sm" onclick="delPoste(\'' + p.id + '\')">Supp.</button>';
+    html += "</div></div>";
+  });
+  el.innerHTML = html;
+}
+window.editPoste = function(id) {
+  var p = postes.find(function(x) { return x.id === id; }); if (!p) return;
+  document.getElementById("f-num").value = p.num;
+  document.getElementById("f-name").value = p.name;
+  document.getElementById("f-code").value = p.code;
+  document.getElementById("f-lat").value = p.lat || "";
+  document.getElementById("f-lng").value = p.lng || "";
+  document.getElementById("editing-id").value = p.id;
+  document.getElementById("form-title").textContent = "Modifier poste";
+  document.getElementById("final-warning").style.display = (p.num === 10) ? "block" : "none";
+  buildQuestionsUI(p.isFinal, p.questions || []);
+  adminMap = null; /* reset carte pour reinit */
+  setTimeout(function() { initAdminMap(); }, 200);
+};
+window.delPoste = async function(id) {
+  if (!confirm("Supprimer ce poste ?")) return;
+  await fbDel(rPoste(id));
+  postes = postes.filter(function(p) { return p.id !== id; }); renderPostes();
+};
+window.resetForm = function() {
+  document.getElementById("f-num").value = "";
+  document.getElementById("f-name").value = "";
+  document.getElementById("f-code").value = "";
+  document.getElementById("f-lat").value = "";
+  document.getElementById("f-lng").value = "";
+  document.getElementById("editing-id").value = "";
+  document.getElementById("form-title").textContent = "Nouveau poste";
+  document.getElementById("final-warning").style.display = "none";
+  buildQuestionsUI(false, null);
+  if (adminMarker) { adminMap.removeLayer(adminMarker); adminMarker = null; }
+};
+
+/* ── JOUEURS ── */
+var NATO = ["ALFA","BRAVO","CHARLIE","DELTA","ECHO","FOXTROT","GOLF","HOTEL","INDIA","JULIET","KILO","LIMA","MIKE","NOVEMBRE","OSCAR"];
+window.genPseudo = function() {
+  var w = NATO[Math.floor(Math.random() * NATO.length)];
+  document.getElementById("j-pseudo").value = w + "-" + (100 + Math.floor(Math.random() * 900));
+};
+window.addJoueur = async function() {
+  var pseudo = document.getElementById("j-pseudo").value.trim().toUpperCase();
+  var order = parseInt(document.getElementById("j-order").value);
+  if (!pseudo) { alert("Entrez un pseudo."); return; }
+  if (joueurs.find(function(j) { return j.pseudo === pseudo; })) { alert("Pseudo deja existant."); return; }
+  var id = Math.random().toString(36).slice(2);
+  var j = {id:id, pseudo:pseudo, order:order, active:true};
+  await fbSet(rJoueur(id), j);
+  joueurs.push(j); renderJoueurs();
+  document.getElementById("j-pseudo").value = "";
+};
+function renderJoueurs() {
+  var el = document.getElementById("joueurs-list");
+  if (!joueurs.length) { el.innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun joueur.</div>'; return; }
+  var html = "";
+  joueurs.forEach(function(j) {
+    html += '<div class="row-item">';
+    html += '<div class="row-info"><div class="row-name">' + j.pseudo + "</div>";
+    html += '<div class="row-sub">Rotation ' + (j.order+1) + " - " + (j.active ? "ACTIF" : "INACTIF") + "</div></div>";
+    html += '<div class="row-actions">';
+    html += '<button class="btn btn-ghost btn-sm" onclick="showQR(\'' + j.id + '\')">QR</button>';
+    html += '<button class="btn btn-ghost btn-sm" onclick="toggleJoueur(\'' + j.id + '\')">' + (j.active ? "Desactiver" : "Activer") + "</button>";
+    html += '<button class="btn btn-danger btn-sm" onclick="delJoueur(\'' + j.id + '\')">Supp.</button>';
+    html += "</div></div>";
+  });
+  el.innerHTML = html;
+}
+window.toggleJoueur = async function(id) {
+  var j = joueurs.find(function(x) { return x.id === id; }); if (!j) return;
+  j.active = !j.active; await fbSet(rJoueur(id), j); renderJoueurs();
+};
+window.delJoueur = async function(id) {
+  if (!confirm("Supprimer ce joueur ?")) return;
+  await fbDel(rJoueur(id));
+  joueurs = joueurs.filter(function(j) { return j.id !== id; }); renderJoueurs();
+};
+
+/* ── QR ── */
+window.showQR = function(id) {
+  var j = joueurs.find(function(x) { return x.id === id; }); if (!j) return;
+  document.getElementById("qr-modal-title").textContent = j.pseudo;
+  document.getElementById("qr-modal-sub").textContent = "Rotation " + (j.order+1) + " - " + (j.active ? "ACTIF" : "INACTIF");
+  var out = document.getElementById("qr-out"); out.innerHTML = "";
+  var base = (CFG.siteUrl || location.href).split("?")[0].replace(/\/$/, "");
+  var url = base + "?login=" + encodeURIComponent(j.pseudo);
+  document.getElementById("qr-url-display").textContent = url;
+  new QRCode(out, {text:url, width:200, height:200, colorDark:"#000000", colorLight:"#ffffff"});
+  document.getElementById("qr-overlay").classList.add("open");
+};
+window.closeQR = function() { document.getElementById("qr-overlay").classList.remove("open"); };
+
+/* ── LEADERBOARD ── */
+function fmtTime(s) {
+  var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return [h,m,sec].map(function(v) { return String(v).padStart(2,"0"); }).join(":");
+}
+window.loadLB = async function() {
+  await fbLoadSessions();
+  var el = document.getElementById("lb-list");
+  if (!sessions.length) { el.innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun resultat.</div>'; return; }
+  var sorted = sessions.slice().sort(function(a,b) {
+    if (b.score !== a.score) return b.score - a.score;
+    return (a.elapsed||99999) - (b.elapsed||99999);
+  });
+  var html = "";
+  sorted.forEach(function(s, i) {
+    html += '<div class="lb-row">';
+    html += '<div class="lb-rank">' + (i+1) + "</div>";
+    html += '<div class="lb-name">' + s.name + (s.stoppedByAdmin ? " [ARRETE]" : "") + "</div>";
+    html += '<div class="lb-score">' + s.score + "/" + s.total + "</div>";
+    html += '<div class="lb-time">' + (s.elapsed != null ? fmtTime(s.elapsed) : "-") + "</div>";
+    if (s.bonus) {
+      var bonusStr = s.bonus > 0 ? "-" + fmtTime(s.bonus) : "+" + fmtTime(Math.abs(s.bonus));
+      html += '<div style="font-size:.7rem;color:var(--khaki)">bonus: ' + bonusStr + "</div>";
+    }
+    html += '<div style="font-size:.7rem;color:var(--dim)">' + s.date + "</div>";
+    html += "</div>";
+  });
+  el.innerHTML = html;
+};
+
+window.refreshMapNow = async function() {
+  var gpsData = await loadGPSData();
+  await initMap(gpsData);
+  updateMapTimer();
+};
+
+window.loadLive = async function() {
+  var el = document.getElementById("live-list");
+  el.innerHTML = '<div style="color:var(--dim);font-size:.85rem">Chargement...</div>';
+  /* Charger GPS et progression en parallele */
+  var gpsData = await loadGPSData();
+  await initMap(gpsData);
+  var list = await fbLoadProgress();
+  if (!list.length) {
+    el.innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun participant.</div>';
+    document.getElementById("stop-list").innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun participant actif.</div>';
+    return;
+  }
+  list.sort(function(a,b) {
+    return Object.keys(b.validated||{}).length - Object.keys(a.validated||{}).length;
+  });
+  var html = "";
+  list.forEach(function(p) {
+    var validated = p.validated || {};
+    /* Compter uniquement les postes termines (true ou false) */
+    var keys = Object.keys(validated);
+    var done = keys.length;
+    var correct = keys.filter(function(k) { return validated[k] === true; }).length;
+    var incorrect = keys.filter(function(k) { return validated[k] === false; }).length;
+    var tot = postes.length || 10;
+    var pct = tot ? Math.round(done / tot * 100) : 0;
+    var rowClass = p.stopped ? "stopped" : (pct === 100 ? "done" : "inprogress");
+    var bonusStr = "";
+    if (p.bonus) {
+      bonusStr = p.bonus > 0
+        ? '<span style="color:#2ecc71;font-size:.75rem">-' + fmtTime(p.bonus) + '</span>'
+        : '<span style="color:#e74c3c;font-size:.75rem">+' + fmtTime(Math.abs(p.bonus)) + '</span>';
+    }
+    html += '<div class="live-row ' + rowClass + '">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div style="font-weight:700;font-size:.95rem">' + p.pseudo + "</div>";
+    html += '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">';
+    if (p.elapsed != null) html += '<span style="font-family:Share Tech Mono,monospace;font-size:.8rem;color:var(--khaki)">Temps: ' + fmtTime(p.elapsed) + "</span>";
+    html += '<span style="font-family:Share Tech Mono,monospace;font-size:.8rem;color:var(--sand)">' + done + "/" + tot + "</span>";
+    html += '<span style="font-size:.75rem;color:#2ecc71;font-weight:700">' + correct + "V</span>";
+    html += '<span style="font-size:.75rem;color:#e74c3c;font-weight:700">' + incorrect + "X</span>";
+    if (bonusStr) html += bonusStr;
+    if (p.stopped) html += '<span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:2px;background:rgba(192,57,43,.15);color:#e74c3c;border:1px solid var(--red)">ARRETE</span>';
+    else if (pct === 100) html += '<span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:2px;background:rgba(39,174,96,.15);color:#2ecc71;border:1px solid var(--green)">TERMINE</span>';
+    html += "</div></div>";
+    var barColor = (p.stopped || pct === 100) ? "var(--green)" : "var(--khaki)";
+    html += '<div style="height:3px;background:var(--bg);border-radius:2px;margin-bottom:8px">';
+    html += '<div style="height:3px;width:' + pct + '%;background:' + barColor + ';border-radius:2px"></div></div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">';
+    postes.forEach(function(poste) {
+      var v = validated[String(poste.num)];
+      var detail = p.detail ? (p.detail[String(poste.num)] || []) : [];
+      var ico, col, bg;
+      if (v === true)       { ico = "V"; col = "#2ecc71"; bg = "rgba(39,174,96,.15)"; }
+      else if (v === false) { ico = "X"; col = "#e74c3c"; bg = "rgba(192,57,43,.12)"; }
+      else                  { ico = "?"; col = "var(--dim)"; bg = "transparent"; }
+      /* Badge poste avec tooltip */
+      html += '<span style="font-family:Share Tech Mono,monospace;font-size:.75rem;color:' + col + ';background:' + bg + ';border:1px solid ' + col + ';border-radius:2px;padding:1px 5px">'
+        + String(poste.num).padStart(2,"0") + ":" + ico + "</span>";
+    });
+    html += "</div>";
+    /* Detail des reponses par poste */
+    var detail = p.detail || {};
+    var hasDetail = Object.keys(detail).length > 0;
+    if (hasDetail) {
+      html += '<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">';
+      html += '<div style="font-family:Barlow Condensed,sans-serif;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Detail des reponses</div>';
+      postes.forEach(function(poste) {
+        var qs = detail[String(poste.num)];
+        if (!qs || qs.length === 0) return;
+        html += '<div style="margin-bottom:6px">';
+        html += '<div style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:3px">Poste ' + String(poste.num).padStart(2,"0") + ' - ' + poste.name + '</div>';
+        html += '<div style="display:flex;gap:5px;flex-wrap:wrap">';
+        qs.forEach(function(correct, qi) {
+          var qLabel = "Q" + (qi+1);
+          var qCol = correct ? "#2ecc71" : "#e74c3c";
+          var qBg = correct ? "rgba(39,174,96,.15)" : "rgba(192,57,43,.12)";
+          var qIco = correct ? "V" : "X";
+          /* Afficher le texte de la question si disponible */
+          var posteData = postes.find(function(p2) { return p2.num === poste.num; });
+          var qText = (posteData && posteData.questions && posteData.questions[qi]) ? posteData.questions[qi].question : "";
+          html += '<span style="font-family:Share Tech Mono,monospace;font-size:.8rem;font-weight:700;color:white;background:' + (correct ? '#27ae60' : '#c0392b') + ';border-radius:3px;padding:3px 10px">'
+            + qLabel + " " + qIco + "</span>";
+        });
+        html += "</div></div>";
+      });
+      html += "</div>";
+    }
+    if (p.updatedAt) html += '<div style="font-size:.68rem;color:var(--dim)">Activite: ' + new Date(p.updatedAt).toLocaleTimeString("fr-FR") + "</div>";
+    html += "</div>";
+  });
+  el.innerHTML = html;
+  renderStopList(list);
+};
+
+function renderStopList(list) {
+  var el = document.getElementById("stop-list");
+  var active = list.filter(function(p) { return !p.stopped && p.elapsed == null; });
+  if (!active.length) { el.innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun chrono actif.</div>'; return; }
+  var html = "";
+  active.forEach(function(p) {
+    var done = Object.keys(p.validated||{}).length;
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:10px 14px;margin-bottom:7px">';
+    html += '<div><div style="font-weight:700">' + p.pseudo + "</div>";
+    html += '<div style="font-family:Share Tech Mono,monospace;font-size:.7rem;color:var(--khaki)">' + done + "/" + (postes.length||10) + " postes</div></div>";
+    html += '<button class="btn btn-danger btn-sm" onclick="stopChrono(\'' + p.pseudo + '\')">Arreter</button>';
+    html += "</div>";
+  });
+  el.innerHTML = html;
+}
+
+window.stopChrono = async function(pseudo) {
+  if (!confirm("Arreter le chrono de " + pseudo + " ?")) return;
+  try {
+    var snap = await getDocs(cProgress());
+    var found = null;
+    snap.forEach(function(d) { if (d.data().pseudo === pseudo) found = d.data(); });
+    if (!found) { alert("Participant introuvable."); return; }
+    /* Calculer le temps ajuste */
+    var rawElapsed = Math.floor((Date.now() - (found.startTime || Date.now())) / 1000);
+    var bonus = found.bonus || 0;
+    var adjusted = Math.max(0, rawElapsed - bonus);
+    var now = new Date().toISOString();
+    await fbSet(rProg(pseudo), Object.assign({}, found, {
+      stopped: true, stoppedAt: now, updatedAt: now,
+      elapsed: adjusted, elapsedRaw: rawElapsed
+    }));
+    var ssnap = await getDocs(cSessions());
+    var already = false;
+    ssnap.forEach(function(d) { if (d.data().name === pseudo) already = true; });
+    if (!already) {
+      var done = Object.keys(found.validated||{}).length;
+      await fbAdd(cSessions(), {
+        name: pseudo, score: done, total: postes.length||10,
+        elapsed: adjusted, elapsedRaw: rawElapsed, bonus: bonus,
+        date: new Date().toLocaleString("fr-FR"), stoppedByAdmin: true
+      });
+    }
+    alert("Chrono de " + pseudo + " arrete. Temps ajuste: " + fmtTime(adjusted) + " (brut: " + fmtTime(rawElapsed) + ")");
+    loadLive();
+  } catch(e) { alert("Erreur: " + e.message); }
+};
+
+window.resetAll = async function() {
+  if (!confirm("Effacer tous les resultats et progressions ?")) return;
+  var ss = await getDocs(cSessions()); ss.forEach(function(d) { deleteDoc(doc(DB,"ot_sessions",d.id)); });
+  var pp = await getDocs(cProgress());  pp.forEach(function(d) { deleteDoc(doc(DB,"ot_progress",d.id)); });
+  sessions = [];
+  document.getElementById("lb-list").innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun resultat.</div>';
+  document.getElementById("live-list").innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun participant.</div>';
+  document.getElementById("stop-list").innerHTML = '<div style="color:var(--dim);font-size:.85rem">Aucun chrono actif.</div>';
+};
+
+/* ── CARTE ADMIN (placement balises) ── */
+var adminMap = null, adminMarker = null;
+
+async function initAdminMap() {
+  if (!window.L) {
+    await new Promise(function(resolve) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+      s.onload = resolve; document.head.appendChild(s);
+    });
+  }
+  var container = document.getElementById("admin-map");
+  if (!container || adminMap) return;
+  var lat = parseFloat(document.getElementById("f-lat").value) || 46.5;
+  var lng = parseFloat(document.getElementById("f-lng").value) || 2.5;
+  var zoom = (document.getElementById("f-lat").value) ? 15 : 6;
+  adminMap = L.map("admin-map").setView([lat, lng], zoom);
+  L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+    attribution: "OpenTopoMap contributors", maxZoom: 17
+  }).addTo(adminMap);
+  /* Clic sur la carte = placer la balise */
+  adminMap.on("click", function(e) {
+    var lat2 = e.latlng.lat.toFixed(6);
+    var lng2 = e.latlng.lng.toFixed(6);
+    document.getElementById("f-lat").value = lat2;
+    document.getElementById("f-lng").value = lng2;
+    placeAdminMarker(e.latlng.lat, e.latlng.lng);
+  });
+  /* Si coordonnees deja renseignees */
+  if (document.getElementById("f-lat").value) {
+    placeAdminMarker(lat, lng);
+  }
+  /* Mise a jour manuelle des champs = deplace le marqueur */
+  document.getElementById("f-lat").addEventListener("change", function() { syncAdminMarker(); });
+  document.getElementById("f-lng").addEventListener("change", function() { syncAdminMarker(); });
+}
+
+function placeAdminMarker(lat, lng) {
+  var numEl = document.getElementById("f-num");
+  var num = numEl.value || "?";
+  if (adminMarker) { adminMap.removeLayer(adminMarker); }
+  var icon = L.divIcon({
+    className: "",
+    html: '<div style="background:#c8b882;color:#1a1c16;font-family:Share Tech Mono,monospace;font-size:11px;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)">' + num + '</div>',
+    iconAnchor: [14, 14]
+  });
+  adminMarker = L.marker([lat, lng], {icon: icon}).addTo(adminMap);
+  adminMap.setView([lat, lng], Math.max(adminMap.getZoom(), 13));
+}
+
+function syncAdminMarker() {
+  var lat = parseFloat(document.getElementById("f-lat").value);
+  var lng = parseFloat(document.getElementById("f-lng").value);
+  if (!isNaN(lat) && !isNaN(lng)) placeAdminMarker(lat, lng);
+}
+
+/* ── CARTE PARTICIPANT ── */
+var pMap = null, pPosMarker = null, pNextMarker = null, pTracePolyline = null;
+var pTrace = [], pNavInterval = null;
+var currentScanTab = "map";
+
+window.switchScanTab = function(tab) {
+  currentScanTab = tab;
+  document.getElementById("scan-map-view").style.display  = tab === "map"  ? "block" : "none";
+  document.getElementById("scan-code-view").style.display = tab === "code" ? "block" : "none";
+  document.getElementById("tab-map-btn").className  = "btn btn-sm " + (tab === "map"  ? "btn-primary" : "btn-ghost");
+  document.getElementById("tab-code-btn").className = "btn btn-sm " + (tab === "code" ? "btn-primary" : "btn-ghost");
+  if (tab === "map") { setTimeout(function() { if (pMap) pMap.invalidateSize(); }, 100); }
+};
+
+async function initPMap() {
+  if (!window.L) {
+    await new Promise(function(resolve) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+      s.onload = resolve; document.head.appendChild(s);
+    });
+  }
+  var container = document.getElementById("p-map");
+  if (!container || pMap) return;
+  pMap = L.map("p-map").setView([46.5, 2.5], 6);
+  L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+    attribution: "OpenTopoMap contributors", maxZoom: 17
+  }).addTo(pMap);
+  pTracePolyline = L.polyline([], {color: "#3498db", weight: 3, opacity: 0.7}).addTo(pMap);
+}
+
+function updatePMap(userLat, userLng) {
+  if (!pMap) return;
+  /* Marqueur position participant */
+  if (pPosMarker) {
+    pPosMarker.setLatLng([userLat, userLng]);
+  } else {
+    var posIcon = L.divIcon({
+      className: "",
+      html: '<div style="width:16px;height:16px;background:#3498db;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>',
+      iconAnchor: [8, 8]
+    });
+    pPosMarker = L.marker([userLat, userLng], {icon: posIcon, zIndexOffset: 1000}).addTo(pMap);
+    pMap.setView([userLat, userLng], 15);
+  }
+  /* Trace */
+  pTrace.push([userLat, userLng]);
+  pTracePolyline.setLatLngs(pTrace);
+  /* Toutes les balises deja validees + prochaine */
+  refreshPMapMarkers(userLat, userLng);
+  /* Navigation vers prochaine balise */
+  updateNavBanner(userLat, userLng);
+}
+
+function refreshPMapMarkers(userLat, userLng) {
+  if (!pMap || !pJoueur) return;
+  var route = getRoute(pJoueur);
+  route.forEach(function(poste) {
+    if (!poste.lat || !poste.lng) return;
+    var done = pPostes.hasOwnProperty(poste.num);
+    var isNext = !done && !getRoute(pJoueur).slice(0, route.indexOf(poste)).some(function(p) { return !pPostes.hasOwnProperty(p.num); }) ;
+    var bg = done ? "#27ae60" : isNext ? "#c8b882" : "#7a7560";
+    var icon = L.divIcon({
+      className: "",
+      html: '<div style="background:' + bg + ';color:' + (done ? "white" : "#1a1c16") + ';font-family:Share Tech Mono,monospace;font-size:11px;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)">' + String(poste.num).padStart(2,"0") + '</div>',
+      iconAnchor: [14, 14]
+    });
+    if (!poste._marker) {
+      poste._marker = L.marker([poste.lat, poste.lng], {icon: icon})
+        .addTo(pMap)
+        .bindPopup("Poste " + String(poste.num).padStart(2,"0") + " — " + poste.name);
+    } else {
+      poste._marker.setIcon(icon);
+    }
+  });
+}
+
+function updateNavBanner(userLat, userLng) {
+  if (!pJoueur) return;
+  var next = getNext(pJoueur, pPostes);
+  var banner = document.getElementById("nav-banner");
+  if (!next || !next.lat || !next.lng) { if (banner) banner.style.display = "none"; return; }
+  if (banner) banner.style.display = "block";
+  /* Distance */
+  var dist = haversine(userLat, userLng, next.lat, next.lng);
+  var distStr = dist < 1000 ? Math.round(dist) + " m" : (dist/1000).toFixed(1) + " km";
+  /* Direction */
+  var bearing = getBearing(userLat, userLng, next.lat, next.lng);
+  var arrow = bearingToArrow(bearing);
+  document.getElementById("nav-name").textContent = "Poste " + String(next.num).padStart(2,"0") + " — " + next.name;
+  document.getElementById("nav-dist").textContent = distStr;
+  document.getElementById("nav-arrow").textContent = arrow;
+  /* Aussi mettre a jour le prochain poste dans la vue code */
+  var nEl = document.getElementById("next-poste-info");
+  if (nEl) nEl.textContent = "Poste " + String(next.num).padStart(2,"0") + " — " + next.name + (next.isFinal ? " (FINAL)" : "");
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  var R = 6371000;
+  var dLat = (lat2-lat1) * Math.PI/180;
+  var dLng = (lng2-lng1) * Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function getBearing(lat1, lng1, lat2, lng2) {
+  var dLng = (lng2-lng1) * Math.PI/180;
+  var y = Math.sin(dLng) * Math.cos(lat2*Math.PI/180);
+  var x = Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180) - Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLng);
+  return (Math.atan2(y,x)*180/Math.PI + 360) % 360;
+}
+function bearingToArrow(b) {
+  var arrows = ["↑","↗","→","↘","↓","↙","←","↖"];
+  return arrows[Math.round(b/45) % 8];
+}
+var gpsInterval = null;
+var leafletMap = null;
+var leafletMarkers = {};
+var mapRefreshInterval = null;
+var COLORS = ["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e22","#e91e63","#00bcd4","#8bc34a","#ff5722","#607d8b"];
+
+function rGps(pseudo) { return doc(DB, "ot_gps", pseudo); }
+function cGps()       { return collection(DB, "ot_gps"); }
+
+function startGPS() {
+  if (!navigator.geolocation) return;
+  /* Envoyer position immediatement puis toutes les 30s */
+  sendGPS();
+  gpsInterval = setInterval(sendGPS, 30000);
+}
+function stopGPS() {
+  clearInterval(gpsInterval);
+  gpsInterval = null;
+}
+function sendGPS() {
+  if (!pJoueur) return;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    fbSet(rGps(pJoueur.pseudo), {
+      pseudo: pJoueur.pseudo,
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+      accuracy: Math.round(pos.coords.accuracy),
+      updatedAt: new Date().toISOString()
+    });
+  }, function(err) {
+    console.warn("GPS indisponible:", err.message);
+  }, {enableHighAccuracy: true, timeout: 10000});
+}
+
+async function loadGPSData() {
+  var list = [];
+  try {
+    var ps = await getDocs(cGps());
+    ps.forEach(function(d) { list.push(d.data()); });
+  } catch(e) {}
+  return list;
+}
+
+async function initMap(gpsData) {
+  /* Charger Leaflet dynamiquement */
+  if (!window.L) {
+    await new Promise(function(resolve) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+      s.onload = resolve;
+      document.head.appendChild(s);
+    });
+  }
+  var container = document.getElementById("map-container");
+  if (!container) return;
+
+  if (!leafletMap) {
+    /* Centre par defaut sur la France */
+    var centerLat = 46.5, centerLng = 2.5, zoom = 6;
+    /* Si on a des positions GPS, centrer dessus */
+    if (gpsData.length > 0) {
+      centerLat = gpsData[0].lat;
+      centerLng = gpsData[0].lng;
+      zoom = 15;
+    }
+    leafletMap = L.map("map-container").setView([centerLat, centerLng], zoom);
+    L.tileLayer("https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}", {
+      attribution: "IGN-F/Geoportail",
+      maxZoom: 18,
+      tileSize: 256
+    }).addTo(leafletMap);
+  }
+
+  /* Mettre a jour les marqueurs */
+  var legend = document.getElementById("map-legend");
+  if (legend) legend.innerHTML = "";
+  var bounds = [];
+
+  gpsData.forEach(function(p, idx) {
+    if (!p.lat || !p.lng) return;
+    var color = COLORS[idx % COLORS.length];
+    var age = p.updatedAt ? Math.floor((Date.now() - new Date(p.updatedAt).getTime()) / 1000) : null;
+    var ageStr = age !== null ? (age < 60 ? age + "s" : Math.floor(age/60) + "min") : "?";
+    var popupHtml = "<b>" + p.pseudo + "</b><br>Precision: " + (p.accuracy||"?") + "m<br>Mis a jour: " + ageStr;
+
+    if (leafletMarkers[p.pseudo]) {
+      leafletMarkers[p.pseudo].setLatLng([p.lat, p.lng]);
+      leafletMarkers[p.pseudo].setPopupContent(popupHtml);
+    } else {
+      var icon = L.divIcon({
+        className: "",
+        html: '<div style="background:' + color + ';color:white;font-family:Share Tech Mono,monospace;font-size:10px;font-weight:700;padding:4px 7px;border-radius:20px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4);white-space:nowrap">' + p.pseudo + '</div>',
+        iconAnchor: [0, 10]
+      });
+      leafletMarkers[p.pseudo] = L.marker([p.lat, p.lng], {icon: icon})
+        .addTo(leafletMap)
+        .bindPopup(popupHtml);
+    }
+    bounds.push([p.lat, p.lng]);
+
+    /* Legende */
+    if (legend) {
+      var dot = document.createElement("div");
+      dot.style.cssText = "display:flex;align-items:center;gap:6px;font-size:.78rem";
+      dot.innerHTML = '<div style="width:12px;height:12px;border-radius:50%;background:' + color + ';flex-shrink:0"></div>'
+        + '<span style="color:var(--text)">' + p.pseudo + '</span>'
+        + '<span style="color:var(--dim);font-family:Share Tech Mono,monospace;font-size:.7rem">' + ageStr + '</span>';
+      legend.appendChild(dot);
+    }
+  });
+
+  if (bounds.length > 1) {
+    leafletMap.fitBounds(bounds, {padding: [30, 30]});
+  } else if (bounds.length === 1) {
+    leafletMap.setView(bounds[0], 15);
+  }
+
+  /* Message si pas de GPS */
+  if (gpsData.length === 0) {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:.85rem;background:var(--bg3)">Aucune position GPS recue. Les participants doivent autoriser la localisation.</div>';
+    leafletMap = null;
+  }
+}
+function getRoute(j) {
+  var inter = postes.filter(function(p) { return !p.isFinal; }).sort(function(a,b) { return a.num - b.num; });
+  var finale = postes.find(function(p) { return p.isFinal; });
+  var rot = j.order % Math.max(inter.length, 1);
+  var rotated = inter.slice(rot).concat(inter.slice(0,rot));
+  return finale ? rotated.concat([finale]) : rotated;
+}
+function getNext(j, postesValides) {
+  var route = getRoute(j);
+  for (var i = 0; i < route.length; i++) {
+    if (!postesValides.hasOwnProperty(route[i].num)) return route[i];
+  }
+  return null;
+}
+
+/* ── PARTICIPANT LOGIN ── */
+window.doLogin = async function(raw) {
+  var n = (raw||"").trim().toUpperCase();
+  document.getElementById("login-err").textContent = "";
+  if (!n) { document.getElementById("login-err").textContent = "Entrez votre pseudo."; return; }
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("login-loading").style.display = "block";
+  await fbLoadAll();
+  document.getElementById("login-loading").style.display = "none";
+  document.getElementById("login-form").style.display = "block";
+  var j = joueurs.find(function(x) { return x.pseudo === n && x.active; });
+  if (!j) { document.getElementById("login-err").textContent = "Pseudo non autorise ou inactif."; return; }
+  if (postes.length < 10) { document.getElementById("login-err").textContent = "Course non prete (10 postes requis)."; return; }
+  pJoueur = j; pPostes = {}; pBonus = 0;
+  pStartTime = Date.now(); pElapsed = null;
+  pSelOpt = null; pCurrentPoste = null; pQuestions = []; pQIdx = 0;
+  document.getElementById("s-login").style.display = "none";
+  document.getElementById("s-scan").style.display = "block";
+  document.getElementById("scan-name-disp").textContent = j.pseudo;
+  startTimer(); startGPS();
+  /* Initialiser carte participant */
+  initPMap();
+  updateProgress();
+};
+
+/* ── TIMER ── */
+function startTimer() {
+  clearInterval(pTimerInterval); clearInterval(pVisualInterval); stopGPS();
+  var dur = CFG.duration * 60;
+  pVisualInterval = setInterval(function() {
+    if (pElapsed !== null) { clearInterval(pVisualInterval); return; }
+    var tEl = document.getElementById("p-timer");
+    var qEl = document.getElementById("qcm-timer-disp");
+    if (!tEl || tEl.classList.contains("stopped")) return;
+    var rem = dur - Math.floor((Date.now() - pStartTime) / 1000);
+    if (rem < 0) rem = 0;
+    var d = fmtTime(rem);
+    tEl.textContent = d;
+    if (qEl) qEl.textContent = d;
+    if (rem <= 300) tEl.classList.add("urgent");
+  }, 1000);
+  pTimerInterval = setInterval(async function() {
+    if (pElapsed !== null) { clearInterval(pTimerInterval); return; }
+    var rem = dur - Math.floor((Date.now() - pStartTime) / 1000);
+    if (rem <= 0) {
+      clearInterval(pTimerInterval); clearInterval(pVisualInterval);
+      document.getElementById("p-timer").textContent = "00:00:00";
+      alert("Temps ecoule !"); doFinish(); return;
+    }
+    try {
+      var snap = await getDoc(rProg(pJoueur.pseudo));
+      if (snap.exists() && snap.data().stopped) {
+        clearInterval(pTimerInterval); clearInterval(pVisualInterval);
+        pElapsed = Math.floor((Date.now() - pStartTime) / 1000);
+        var tEl = document.getElementById("p-timer");
+        if (tEl) { tEl.textContent = "ARRETE"; tEl.classList.remove("urgent"); tEl.classList.add("stopped"); }
+        alert("Votre chronometre a ete arrete par l'administrateur.");
+      }
+    } catch(e) {}
+  }, 5000);
+}
+
+/* ── CODE BALISE ── */
+window.submitManual = function() {
+  var inp = document.getElementById("manual-code-inp");
+  var code = (inp.value||"").trim().toUpperCase();
+  var errEl = document.getElementById("scan-err");
+  if (!code) { errEl.textContent = "Entrez un code."; return; }
+  errEl.textContent = ""; inp.value = "";
+  var poste = postes.find(function(p) { return p.code && p.code.toUpperCase() === code; });
+  if (!poste) { errEl.textContent = "Code inconnu."; return; }
+  if (pPostes.hasOwnProperty(poste.num)) { errEl.textContent = "Poste deja valide."; return; }
+  var next = getNext(pJoueur, pPostes);
+  if (next && next.num !== poste.num) { errEl.textContent = "Ce n'est pas votre prochain poste."; return; }
+  launchQCM(poste);
+};
+
+/* ── PROGRESS ── */
+function updateProgress() {
+  var route = pJoueur ? getRoute(pJoueur) : [];
+  var done = Object.keys(pPostes).length;
+  var tot = postes.length;
+  document.getElementById("prog-txt").textContent = done + " / " + tot;
+  document.getElementById("scan-tag").textContent = done + " / " + tot;
+  document.getElementById("prog-bar").style.width = tot ? (done/tot*100) + "%" : "0%";
+  var chips = "";
+  route.forEach(function(p) {
+    var entry = pPostes[p.num];
+    var cl = "", label = String(p.num).padStart(2,"0");
+    if (entry) {
+      var allOk = entry.questions.every(function(v) { return v === true; });
+      cl = allOk ? "ok" : "ko";
+      label += allOk ? " V" : " X";
+    } else if (p.isFinal) { cl = "locked"; }
+    chips += '<div class="chip ' + cl + '">' + label + "</div>";
+  });
+  document.getElementById("chip-list").innerHTML = chips;
+  var next = pJoueur ? getNext(pJoueur, pPostes) : null;
+  var nEl = document.getElementById("next-poste-info");
+  if (next) nEl.textContent = "Poste " + String(next.num).padStart(2,"0") + " - " + next.name + (next.isFinal ? " (FINAL)" : "");
+  else nEl.textContent = "Tous les postes valides !";
+}
+
+/* ── QCM ── */
+function launchQCM(poste) {
+  pCurrentPoste = poste; pSelOpt = null;
+  pQuestions = poste.questions || [{question:poste.question||"", explication:poste.explication||"", options:poste.options||[]}];
+  pQIdx = 0;
+  /* Initialiser l'entree pour ce poste */
+  pPostes[poste.num] = {done: false, questions: []};
+  document.getElementById("s-scan").style.display = "none";
+  document.getElementById("s-qcm").style.display = "block";
+  showQuestion();
+}
+function showQuestion() {
+  var poste = pCurrentPoste;
+  var q = pQuestions[pQIdx];
+  var total = pQuestions.length;
+  var suffix = total > 1 ? " (" + (pQIdx+1) + "/" + total + ")" : "";
+  document.getElementById("qn").textContent = String(poste.num).padStart(2,"0");
+  document.getElementById("qname").textContent = poste.name + (poste.isFinal ? " - FINAL" : "") + suffix;
+  document.getElementById("q-text").textContent = q.question;
+  document.getElementById("qtag").textContent = "EN COURS";
+  document.getElementById("qtag").className = "tag tag-wait";
+  document.getElementById("q-feedback").style.display = "none";
+  document.getElementById("q-submit").style.display = "block";
+  document.getElementById("q-next").style.display = "none";
+  pSelOpt = null;
+  var L = "ABCDEFGH", html = "";
+  q.options.forEach(function(o, i) {
+    html += '<div class="opt-choice" id="oc-' + i + '" onclick="selAns(' + i + ')">';
+    html += '<span class="opt-ltr2">' + L[i] + "</span><span>" + o.text + "</span></div>";
+  });
+  document.getElementById("q-opts").innerHTML = html;
+}
+window.selAns = function(i) {
+  pSelOpt = i;
+  document.querySelectorAll('[id^="oc-"]').forEach(function(e) { e.classList.remove("sel"); });
+  var el = document.getElementById("oc-" + i); if (el) el.classList.add("sel");
+};
+window.submitAnswer = function() {
+  if (pSelOpt === null) { alert("Selectionnez une reponse."); return; }
+  var poste = pCurrentPoste;
+  var q = pQuestions[pQIdx];
+  var correct = q.options[pSelOpt].correct;
+  var corrIdx = q.options.findIndex(function(o) { return o.correct; });
+  var L = "ABCDEFGH";
+  document.querySelectorAll('[id^="oc-"]').forEach(function(e, i) {
+    e.classList.add("locked");
+    if (q.options[i].correct) e.classList.add("ok");
+    else if (i === pSelOpt && !correct) e.classList.add("ko");
+  });
+  var fb = document.getElementById("q-feedback");
+  fb.style.display = "block";
+  fb.className = "feedback " + (correct ? "ok" : "ko");
+  fb.innerHTML = correct
+    ? "CORRECT +1 min" + (q.explication ? "<br><small>" + q.explication + "</small>" : "")
+    : "INCORRECT -1 min - Bonne reponse : " + L[corrIdx] + (q.explication ? "<br><small>" + q.explication + "</small>" : "");
+  document.getElementById("qtag").textContent = correct ? "CORRECTE" : "INCORRECTE";
+  document.getElementById("qtag").className = "tag " + (correct ? "tag-ok" : "tag-ko");
+  document.getElementById("q-submit").style.display = "none";
+
+  /* Enregistrer le resultat de cette question dans pPostes */
+  pPostes[poste.num].questions[pQIdx] = correct;
+
+  /* Bonus/malus : +60s si correct (reduit temps), -60s si faux (augmente temps) */
+  pBonus += correct ? 60 : -60;
+
+  var isLastQ = (pQIdx >= pQuestions.length - 1);
+  if (isLastQ) {
+    /* Poste termine */
+    pPostes[poste.num].done = true;
+    /* Sauvegarder progression */
+    saveProgress();
+    var allDone = postes.every(function(p) { return pPostes.hasOwnProperty(p.num) && pPostes[p.num].done; });
+    if (allDone) {
+      pElapsed = Math.max(0, Math.floor((Date.now() - pStartTime) / 1000) - pBonus);
+      clearInterval(pTimerInterval); clearInterval(pVisualInterval);
+      document.getElementById("q-next").innerHTML = '<button class="btn btn-primary" onclick="doFinish()">TERMINER - VOIR MON RESULTAT</button>';
+    } else {
+      document.getElementById("q-next").innerHTML = '<button class="btn btn-ghost" onclick="backToScan()">Poste suivant</button>';
+    }
+    document.getElementById("q-next").style.display = "block";
+  } else {
+    document.getElementById("q-next").innerHTML = '<button class="btn btn-primary" onclick="nextQuestion()">Question suivante</button>';
+    document.getElementById("q-next").style.display = "block";
+  }
+};
+window.nextQuestion = function() {
+  pQIdx++;
+  document.getElementById("q-feedback").style.display = "none";
+  showQuestion();
+};
+window.backToScan = function() {
+  document.getElementById("s-qcm").style.display = "none";
+  document.getElementById("s-scan").style.display = "block";
+  updateProgress();
+};
+
+/* ── FINISH ── */
+window.doFinish = async function() {
+  clearInterval(pTimerInterval); clearInterval(pVisualInterval);
+  var rawElapsed = Math.floor((Date.now() - pStartTime) / 1000);
+  var adjusted = Math.max(0, rawElapsed - pBonus);
+  if (pElapsed === null) pElapsed = adjusted;
+  var validated = buildProgressSnap();
+  var score = Object.keys(validated).filter(function(k) { return validated[k] === true; }).length;
+  var total = postes.length;
+  await fbSet(rProg(pJoueur.pseudo), {
+    pseudo: pJoueur.pseudo, validated: validated,
+    bonus: pBonus, elapsed: adjusted, elapsedRaw: rawElapsed,
+    updatedAt: new Date().toISOString(), stopped: false
+  });
+  await fbAdd(cSessions(), {
+    name: pJoueur.pseudo, score: score, total: total,
+    elapsed: adjusted, elapsedRaw: rawElapsed, bonus: pBonus,
+    date: new Date().toLocaleString("fr-FR")
+  });
+  document.getElementById("s-scan").style.display = "none";
+  document.getElementById("s-qcm").style.display = "none";
+  document.getElementById("s-result").style.display = "block";
+  var pct = total ? Math.round(score/total*100) : 0;
+  document.getElementById("r-score").textContent = score + "/" + total;
+
+  /* Calcul detaille des bonus/malus */
+  var totalQuestions = 0, bonnesRep = 0, mauvaisesRep = 0;
+  var route2 = getRoute(pJoueur);
+  route2.forEach(function(p) {
+    var entry = pPostes[p.num];
+    if (entry && entry.questions) {
+      entry.questions.forEach(function(v) {
+        totalQuestions++;
+        if (v === true) bonnesRep++;
+        else mauvaisesRep++;
+      });
+    }
+  });
+  var bonusSec  = bonnesRep   * 60;
+  var malusSec  = mauvaisesRep * 60;
+  var netBonus  = bonusSec - malusSec; /* positif = gain de temps */
+
+  document.getElementById("r-time").innerHTML =
+    '<div style="font-size:1.1rem;margin-bottom:8px">Temps brut : <strong>' + fmtTime(rawElapsed) + '</strong></div>'
+    + '<div style="color:#2ecc71;margin-bottom:4px">Bonnes reponses : ' + bonnesRep + ' x +1 min = <strong>-' + fmtTime(bonusSec) + '</strong></div>'
+    + '<div style="color:#e74c3c;margin-bottom:4px">Mauvaises reponses : ' + mauvaisesRep + ' x -1 min = <strong>+' + fmtTime(malusSec) + '</strong></div>'
+    + '<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;font-size:1.1rem">Temps final : <strong style="color:var(--sand)">' + fmtTime(adjusted) + '</strong></div>';
+  document.getElementById("r-bonus").textContent = totalQuestions + " questions au total (" + bonnesRep + " correctes / " + mauvaisesRep + " incorrectes)";
+  document.getElementById("r-mention").textContent = pct>=80 ? "EXCELLENT - Mission accomplie" : pct>=60 ? "SATISFAISANT - Peut mieux faire" : "INSUFFISANT - Revoir les fondamentaux";
+  setTimeout(function() { document.getElementById("r-bar").style.width = pct + "%"; }, 100);
+  var route = getRoute(pJoueur);
+  var rhtml = "";
+  route.forEach(function(p) {
+    var entry = pPostes[p.num];
+    var ico;
+    if (!entry) { ico = '<span class="ico-skip">NON VALIDE</span>'; }
+    else {
+      var correct = entry.questions.filter(function(v) { return v === true; }).length;
+      var total2 = entry.questions.length;
+      ico = '<span class="' + (correct === total2 ? "ico-ok" : "ico-ko") + '">' + correct + "/" + total2 + " correctes</span>";
+    }
+    rhtml += '<div class="result-row"><div>' + String(p.num).padStart(2,"00") + " - " + p.name + "</div>" + ico + "</div>";
+  });
+  document.getElementById("r-rows").innerHTML = rhtml;
+};
+
+window.restart = function() {
+  pJoueur = null; pPostes = {}; pBonus = 0;
+  pStartTime = null; pElapsed = null;
+  pCurrentPoste = null; pSelOpt = null; pQuestions = []; pQIdx = 0;
+  pTrace = []; pMap = null; pPosMarker = null; pNextMarker = null;
+  clearInterval(pTimerInterval); clearInterval(pVisualInterval); stopGPS();
+  ["s-login","s-scan","s-qcm","s-result"].forEach(function(id) { document.getElementById(id).style.display = "none"; });
+  document.getElementById("s-login").style.display = "block";
+  document.getElementById("p-name-inp").value = "";
+  document.getElementById("login-err").textContent = "";
+  var tEl = document.getElementById("p-timer");
+  tEl.textContent = fmtTime(CFG.duration * 60);
+  tEl.classList.remove("urgent"); tEl.classList.remove("stopped");
+};
+
+function renderAll() { renderPostes(); renderJoueurs(); }
+
+(async function() {
+  try { await fbLoadAll(); } catch(e) { console.error("Firebase error:", e); }
+  document.getElementById("app-loading").style.display = "none";
+  document.getElementById("app-root").style.display = "block";
+  document.getElementById("p-timer").textContent = fmtTime(CFG.duration * 60);
+  buildQuestionsUI(false, null);
+  var params = new URLSearchParams(location.search);
+  var lp = params.get("login");
+  if (lp) {
+    history.replaceState({}, "", location.pathname);
+    document.getElementById("tab-participant").click();
+    setTimeout(function() { window.doLogin(decodeURIComponent(lp)); }, 300);
+  }
+})();
+</script>
+</body>
+</html>
