@@ -156,7 +156,7 @@ select option{background:var(--bg3)}
       <div class="grid-2">
         <div>
           <div class="card">
-            <div class="card-title">Postes (10 requis - n10 = final commun)</div>
+            <div class="card-title">Postes (<span id="postes-count">0</span> / <span id="postes-total">?</span> — derniere balise = point final)</div>
             <div id="postes-list"></div>
           </div>
         </div>
@@ -175,11 +175,20 @@ select option{background:var(--bg3)}
             </div>
             <label>Position de la balise sur la carte</label>
             <div style="font-size:.72rem;color:var(--dim);margin-bottom:6px">Cliquez sur la carte pour placer la balise.</div>
+            <div class="flex gap-8" style="margin-bottom:6px">
+              <button class="btn btn-ghost btn-sm" onclick="centerAdminOnMe()">📍 Ma position</button>
+              <button class="btn btn-ghost btn-sm" onclick="openFullscreenMap()">⛶ Plein écran</button>
+            </div>
             <div id="admin-map" style="height:240px;border-radius:4px;overflow:hidden;border:1px solid var(--border);cursor:crosshair"></div>
             <div id="admin-map-coords" style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--khaki);margin-top:4px">Aucune position selectionnee</div>
             <input type="hidden" id="f-lat">
             <input type="hidden" id="f-lng">
-            <div id="questions-builder" class="mt-12"></div>
+            <label>Nombre de questions pour ce poste</label>
+            <select id="f-qcount" onchange="onQCountChange()">
+              <option value="1">1 question</option>
+              <option value="2">2 questions</option>
+              <option value="3" selected>3 questions</option>
+            </select>
               <button class="btn btn-primary" onclick="savePoste()">Enregistrer</button>
               <button class="btn btn-ghost" onclick="resetForm()">Annuler</button>
             </div>
@@ -241,20 +250,17 @@ select option{background:var(--bg3)}
         <div id="lb-list"></div>
         <button class="btn btn-danger btn-sm mt-12" onclick="resetAll()">Reinitialiser tous les resultats</button>
       </div>
-    </div>
-
-    <div id="sub-config" style="display:none">
       <div class="card">
         <div class="card-title">Parametres</div>
         <label>Nom de la course</label><input id="cfg-name">
         <label>Unite</label><input id="cfg-unit">
         <label>Duree du chrono (minutes)</label><input type="number" id="cfg-duration" min="1" max="480">
-        <label>URL GitHub Pages</label>
+        <label>Nombre de balises pour cette course</label>
+        <input type="number" id="cfg-nbpostes" min="2" max="30" value="10">
+        <div style="font-size:.72rem;color:var(--dim);margin-top:4px">La derniere balise sera toujours le point final commun a tous.</div>
         <input id="cfg-siteurl" placeholder="https://sampey33.github.io/CO-CHARLIE/">
         <label>Nouveau mot de passe admin</label>
-        <input type="password" id="cfg-pwd" placeholder="Laisser vide = inchange">
         <button class="btn btn-primary mt-12" onclick="saveConfig()">Enregistrer</button>
-      </div>
     </div>
   </div>
 </div>
@@ -291,29 +297,45 @@ select option{background:var(--bg3)}
       </div>
       <!-- Tabs carte / saisie -->
       <div class="flex gap-8" style="margin-bottom:12px">
-        <button class="btn btn-primary btn-sm" id="tab-map-btn" onclick="switchScanTab('map')">Carte</button>
+        <button class="btn btn-primary btn-sm" id="tab-map-btn" onclick="switchScanTab('nav')">Boussole</button>
         <button class="btn btn-ghost btn-sm" id="tab-code-btn" onclick="switchScanTab('code')">Saisir code</button>
       </div>
-      <!-- VUE CARTE -->
+      <!-- VUE BOUSSOLE GPS -->
       <div id="scan-map-view">
-        <!-- Direction / distance -->
-        <div id="nav-banner" style="display:none;background:var(--olive-dark);border:1px solid var(--khaki);border-radius:4px;padding:12px 16px;margin-bottom:10px;text-align:center">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Prochain poste</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;color:var(--sand)" id="nav-name">-</div>
-          <div class="flex gap-8" style="justify-content:center;margin-top:8px">
-            <div style="text-align:center">
-              <div style="font-size:2rem" id="nav-arrow">-</div>
-              <div style="font-size:.72rem;color:var(--dim)">Direction</div>
-            </div>
-            <div style="text-align:center;padding:0 16px">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:1.4rem;color:var(--sand)" id="nav-dist">-</div>
-              <div style="font-size:.72rem;color:var(--dim)">Distance</div>
+        <div id="nav-compass-wrap" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px 16px;text-align:center;margin-bottom:12px">
+          <!-- Nom du prochain poste -->
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Prochain poste</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:900;color:var(--sand);margin-bottom:20px" id="nav-name">-</div>
+          <!-- Grande fleche directionnelle -->
+          <div style="position:relative;width:160px;height:160px;margin:0 auto 20px">
+            <!-- Cercle de fond -->
+            <div style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--border);background:var(--bg3)"></div>
+            <!-- Points cardinaux -->
+            <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim)">N</div>
+            <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim)">S</div>
+            <div style="position:absolute;left:6px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim)">O</div>
+            <div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim)">E</div>
+            <!-- Fleche SVG rotative -->
+            <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <!-- Fleche vers le haut = direction cible -->
+                <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882" stroke="none"/>
+                <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c" stroke="none"/>
+                <!-- Centre -->
+                <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
+              </svg>
             </div>
           </div>
+          <!-- Distance -->
+          <div style="font-family:'Share Tech Mono',monospace;font-size:2.2rem;font-weight:700;color:var(--sand);letter-spacing:3px" id="nav-dist">-</div>
+          <div style="font-size:.72rem;color:var(--dim);margin-top:2px">Distance estimee</div>
+          <!-- Status GPS -->
+          <div id="nav-gps-status" style="margin-top:12px;font-size:.72rem;color:var(--dim)">GPS en attente...</div>
         </div>
-        <!-- Carte participant -->
-        <div id="p-map" style="height:340px;border-radius:4px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px"></div>
-        <div style="font-size:.7rem;color:var(--dim);margin-bottom:12px;text-align:center">Point bleu = votre position. Triangle = prochaine balise.</div>
+        <!-- Message si pas de coords sur le poste -->
+        <div id="nav-no-coords" style="display:none;background:rgba(192,57,43,.1);border:1px solid var(--red);border-radius:4px;padding:12px;text-align:center;font-size:.82rem;color:#e74c3c;margin-bottom:12px">
+          Ce poste n'a pas de coordonnees GPS. Saisissez le code manuellement.
+        </div>
       </div>
       <!-- VUE SAISIE CODE -->
       <div id="scan-code-view" style="display:none">
@@ -367,6 +389,24 @@ select option{background:var(--bg3)}
 </div>
 </div>
 
+<!-- MODAL CARTE PLEIN ECRAN -->
+<div id="fullscreen-map-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:var(--bg);flex-direction:column">
+  <div style="background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sand)">
+      Placer la balise — Poste <span id="fs-num">?</span>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost btn-sm" onclick="centerFullscreenOnMe()">📍 Ma position</button>
+      <button class="btn btn-primary btn-sm" onclick="closeFullscreenMap()">✓ Valider</button>
+    </div>
+  </div>
+  <div id="fullscreen-map" style="flex:1;cursor:crosshair"></div>
+  <div style="background:var(--olive-dark);border-top:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between">
+    <div id="fs-coords" style="font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--khaki)">Cliquez sur la carte pour placer la balise</div>
+    <div style="font-size:.7rem;color:var(--dim)">Pincez pour zoomer • Cliquez pour placer</div>
+  </div>
+</div>
+
 <div class="overlay" id="qr-overlay">
   <div class="modal">
     <h3 id="qr-modal-title">QR CODE JOUEUR</h3>
@@ -408,7 +448,7 @@ function cSessions()   { return collection(DB, "ot_sessions"); }
 function cProgress()   { return collection(DB, "ot_progress"); }
 
 /* ── ETAT GLOBAL ── */
-var CFG = {name:"COPA", unit:"Section 2 — Peloton Eclaireur", duration:120, pwd:"admin1234", siteUrl:"https://sampey33.github.io/CO-CHARLIE/"};
+var CFG = {name:"COPA", unit:"Section 2 — Peloton Eclaireur", duration:120, pwd:"admin1234", siteUrl:"https://sampey33.github.io/COPA/", nbPostes:10};
 var postes = [], joueurs = [], sessions = [];
 
 /*
@@ -432,7 +472,10 @@ async function fbLoadAll() {
   try {
     var ps = await getDocs(cPostes());
     ps.forEach(function(d) { postes.push(Object.assign({id:d.id}, d.data())); });
-    postes.sort(function(a,b) { return a.num - b.num; });
+    /* La derniere balise (numero le plus eleve) est le point final commun */
+  postes.sort(function(a,b) { return a.num - b.num; });
+  var maxNum = postes.length ? postes[postes.length-1].num : 0;
+  postes.forEach(function(p) { p.isFinal = (p.num === maxNum && postes.length === CFG.nbPostes); });
   } catch(e) {}
   joueurs = [];
   try {
@@ -521,6 +564,7 @@ window.saveConfig = async function() {
   var n = document.getElementById("cfg-name").value; if (n) CFG.name = n;
   var u = document.getElementById("cfg-unit").value; if (u) CFG.unit = u;
   var d = parseInt(document.getElementById("cfg-duration").value); if (d) CFG.duration = d;
+  var nb = parseInt(document.getElementById("cfg-nbpostes").value); if (nb && nb >= 2) CFG.nbPostes = nb;
   var s = document.getElementById("cfg-siteurl").value.trim(); if (s) CFG.siteUrl = s;
   var p = document.getElementById("cfg-pwd").value; if (p) CFG.pwd = p;
   await fbSet(rCfg(), CFG);
@@ -530,6 +574,7 @@ function syncCfg() {
   document.getElementById("cfg-name").value = CFG.name;
   document.getElementById("cfg-unit").value = CFG.unit;
   document.getElementById("cfg-duration").value = CFG.duration;
+  document.getElementById("cfg-nbpostes").value = CFG.nbPostes || 10;
   document.getElementById("cfg-siteurl").value = CFG.siteUrl || "";
 }
 
@@ -600,8 +645,9 @@ window.autoCode = function() {
   var n = document.getElementById("f-num").value || "0";
   document.getElementById("f-code").value = "C" + String(parseInt(n)).padStart(2, "0");
 };
-function buildQuestionsUI(isFinal, existing) {
-  var count = isFinal ? 1 : 3;
+function buildQuestionsUI(count, existing) {
+  if (typeof count === "boolean") count = count ? 1 : 3; /* compatibilite ancien code */
+  count = parseInt(count) || 1;
   var container = document.getElementById("questions-builder");
   container.innerHTML = "";
   qOptIdx = {};
@@ -660,8 +706,8 @@ function getOptsQ(qi) {
   });
   return result;
 }
-function getAllQuestions(isFinal) {
-  var count = isFinal ? 1 : 3;
+function getAllQuestions(count) {
+  count = parseInt(count) || 1;
   var questions = [];
   for (var qi = 0; qi < count; qi++) {
     var qel = document.getElementById("fq-" + qi);
@@ -679,10 +725,11 @@ window.savePoste = async function() {
   var code = document.getElementById("f-code").value.trim().toUpperCase();
   var eid = document.getElementById("editing-id").value;
   var isFinal = (num === 10);
-  if (!num || num < 1 || num > 10 || !name || !code) { alert("Remplissez le numero, le nom et le code."); return; }
+  var qcount = parseInt(document.getElementById("f-qcount").value) || 3;
+  if (!num || num < 1 || num > (CFG.nbPostes||30) || !name || !code) { alert("Remplissez le numero, le nom et le code."); return; }
   if (postes.find(function(p) { return p.code === code && p.id !== eid; })) { alert("Code deja utilise."); return; }
   if (postes.find(function(p) { return p.num === num && p.id !== eid; })) { alert("Numero de poste deja utilise."); return; }
-  var questions = getAllQuestions(isFinal);
+  var questions = getAllQuestions(qcount);
   for (var qi = 0; qi < questions.length; qi++) {
     var q = questions[qi];
     if (!q.question || q.options.length < 2) { alert("Remplissez toutes les questions (min 2 options)."); return; }
@@ -691,7 +738,7 @@ window.savePoste = async function() {
   var lat = parseFloat(document.getElementById("f-lat").value) || null;
   var lng = parseFloat(document.getElementById("f-lng").value) || null;
   var id = eid || Math.random().toString(36).slice(2);
-  var p = {id:id, num:num, name:name, code:code, questions:questions, isFinal:isFinal, lat:lat, lng:lng};
+  var p = {id:id, num:num, name:name, code:code, questions:questions, qcount:qcount, isFinal:isFinal, lat:lat, lng:lng};
   await fbSet(rPoste(id), p);
   if (eid) { var idx = postes.findIndex(function(x) { return x.id === eid; }); postes[idx] = p; }
   else postes.push(p);
@@ -699,6 +746,11 @@ window.savePoste = async function() {
   renderPostes(); resetForm();
 };
 function renderPostes() {
+  var nb = CFG.nbPostes || 10;
+  var countEl = document.getElementById("postes-count");
+  var totalEl = document.getElementById("postes-total");
+  if (countEl) countEl.textContent = postes.length;
+  if (totalEl) totalEl.textContent = nb;
   var el = document.getElementById("postes-list");
   if (!postes.length) { el.innerHTML = '<div style="color:var(--dim);font-size:.85rem;padding:8px 0">Aucun poste.</div>'; return; }
   var html = "";
@@ -725,7 +777,10 @@ window.editPoste = function(id) {
   document.getElementById("editing-id").value = p.id;
   document.getElementById("form-title").textContent = "Modifier poste";
   document.getElementById("final-warning").style.display = (p.num === 10) ? "block" : "none";
-  buildQuestionsUI(p.isFinal, p.questions || []);
+  var qcount = document.getElementById("f-qcount");
+  qcount.value = p.qcount || (p.questions ? p.questions.length : 3);
+  qcount.disabled = false;
+  buildQuestionsUI(parseInt(qcount.value), p.questions || []);
   adminMap = null; /* reset carte pour reinit */
   setTimeout(function() { initAdminMap(); }, 200);
 };
@@ -1049,9 +1104,70 @@ function syncAdminMarker() {
 }
 
 /* ── CARTE PARTICIPANT ── */
-var pMap = null, pPosMarker = null, pNextMarker = null, pTracePolyline = null;
+var pMap = null, pPosMarker = null, pNextMarker = null;
 var pTrace = [], pNavInterval = null;
-var currentScanTab = "map";
+var currentScanTab = "nav";
+var lastUserLat = null, lastUserLng = null;
+var deviceHeading = null; /* cap de l'appareil si dispo */
+
+function startNavigation() {
+  /* Ecouter l'orientation de l'appareil pour orienter la boussole */
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientationabsolute", onDeviceOrientation, true);
+    window.addEventListener("deviceorientation", onDeviceOrientation, true);
+  }
+  updateNavUI();
+}
+
+function onDeviceOrientation(e) {
+  if (e.absolute && e.alpha !== null) {
+    deviceHeading = e.alpha; /* cap magnetique en degres */
+  } else if (e.webkitCompassHeading !== undefined) {
+    deviceHeading = e.webkitCompassHeading; /* iOS */
+  }
+  if (lastUserLat !== null) updateArrow();
+}
+
+function updateNavUI() {
+  if (!pJoueur) return;
+  var next = getNext(pJoueur, pPostes);
+  var nameEl = document.getElementById("nav-name");
+  var distEl = document.getElementById("nav-dist");
+  var noCoords = document.getElementById("nav-no-coords");
+  var statusEl = document.getElementById("nav-gps-status");
+  if (!next) {
+    if (nameEl) nameEl.textContent = "Tous les postes valides !";
+    if (distEl) distEl.textContent = "-";
+    return;
+  }
+  if (nameEl) nameEl.textContent = "Poste " + String(next.num).padStart(2,"0") + " — " + next.name;
+  if (!next.lat || !next.lng) {
+    if (noCoords) noCoords.style.display = "block";
+    if (distEl) distEl.textContent = "?";
+    return;
+  }
+  if (noCoords) noCoords.style.display = "none";
+  if (lastUserLat !== null) {
+    var dist = haversine(lastUserLat, lastUserLng, next.lat, next.lng);
+    if (distEl) distEl.textContent = dist < 1000 ? Math.round(dist) + " m" : (dist/1000).toFixed(2) + " km";
+    updateArrow();
+    if (statusEl) statusEl.textContent = "GPS actif — precision: " + (window.lastGpsAccuracy||"?") + " m";
+  } else {
+    if (statusEl) statusEl.textContent = "GPS en attente de signal...";
+  }
+}
+
+function updateArrow() {
+  if (!pJoueur || lastUserLat === null) return;
+  var next = getNext(pJoueur, pPostes);
+  if (!next || !next.lat || !next.lng) return;
+  /* Calcul du cap vers la cible */
+  var bearing = getBearing(lastUserLat, lastUserLng, next.lat, next.lng);
+  /* Si on connait l'orientation de l'appareil, on soustrait pour avoir une boussole relative */
+  var rotation = deviceHeading !== null ? bearing - deviceHeading : bearing;
+  var wrap = document.getElementById("nav-arrow-wrap");
+  if (wrap) wrap.style.transform = "rotate(" + rotation + "deg)";
+}
 
 window.switchScanTab = function(tab) {
   currentScanTab = tab;
@@ -1312,16 +1428,14 @@ window.doLogin = async function(raw) {
   document.getElementById("login-form").style.display = "block";
   var j = joueurs.find(function(x) { return x.pseudo === n && x.active; });
   if (!j) { document.getElementById("login-err").textContent = "Pseudo non autorise ou inactif."; return; }
-  if (postes.length < 10) { document.getElementById("login-err").textContent = "Course non prete (10 postes requis)."; return; }
+  if (postes.length < CFG.nbPostes) { document.getElementById("login-err").textContent = "Course non prete (" + CFG.nbPostes + " postes requis, " + postes.length + " configures)."; return; }
   pJoueur = j; pPostes = {}; pBonus = 0;
   pStartTime = Date.now(); pElapsed = null;
   pSelOpt = null; pCurrentPoste = null; pQuestions = []; pQIdx = 0;
   document.getElementById("s-login").style.display = "none";
   document.getElementById("s-scan").style.display = "block";
   document.getElementById("scan-name-disp").textContent = j.pseudo;
-  startTimer(); startGPS();
-  /* Initialiser carte participant */
-  initPMap();
+  startTimer(); startGPS(); startNavigation();
   updateProgress();
 };
 
@@ -1481,8 +1595,7 @@ window.submitAnswer = function() {
       document.getElementById("q-next").innerHTML = '<button class="btn btn-primary" onclick="doFinish()">TERMINER - VOIR MON RESULTAT</button>';
     } else {
       document.getElementById("q-next").innerHTML = '<button class="btn btn-ghost" onclick="backToScan()">Poste suivant</button>';
-    }
-    document.getElementById("q-next").style.display = "block";
+    }    document.getElementById("q-next").style.display = "block";
   } else {
     document.getElementById("q-next").innerHTML = '<button class="btn btn-primary" onclick="nextQuestion()">Question suivante</button>';
     document.getElementById("q-next").style.display = "block";
@@ -1497,6 +1610,7 @@ window.backToScan = function() {
   document.getElementById("s-qcm").style.display = "none";
   document.getElementById("s-scan").style.display = "block";
   updateProgress();
+  updateNavUI(); /* Rafraichir la boussole vers le prochain poste */
 };
 
 /* ── FINISH ── */
@@ -1587,7 +1701,7 @@ function renderAll() { renderPostes(); renderJoueurs(); }
   document.getElementById("app-loading").style.display = "none";
   document.getElementById("app-root").style.display = "block";
   document.getElementById("p-timer").textContent = fmtTime(CFG.duration * 60);
-  buildQuestionsUI(false, null);
+  buildQuestionsUI(3, null);
   var params = new URLSearchParams(location.search);
   var lp = params.get("login");
   if (lp) {
