@@ -148,6 +148,7 @@ select option{background:var(--bg3)}
       <button class="btn btn-primary btn-sm" onclick="subNav('postes')">Postes</button>
       <button class="btn btn-ghost btn-sm" onclick="subNav('joueurs')">Joueurs</button>
       <button class="btn btn-ghost btn-sm" onclick="subNav('leaderboard')">Classement</button>
+      <button class="btn btn-ghost btn-sm" onclick="subNav('regles')">Regles</button>
       <button class="btn btn-ghost btn-sm" onclick="subNav('config')">Config</button>
       <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="adminLogout()">Deconnexion</button>
     </div>
@@ -159,7 +160,51 @@ select option{background:var(--bg3)}
             <div class="card-title">Postes (<span id="postes-count">0</span> / <span id="postes-total">?</span> — derniere balise = point final)</div>
             <div id="postes-list"></div>
           </div>
+          <div class="card">
+            <div class="card-title">Carte des balises placees</div>
+            <div id="overview-map" style="height:280px;border-radius:4px;overflow:hidden;border:1px solid var(--border)"></div>
+            <div style="font-size:.7rem;color:var(--dim);margin-top:6px">Les balises apparaissent apres avoir ete placees.</div>
+          </div>
         </div>
+        <div>
+          <div class="card">
+            <div class="card-title" id="form-title">Nouveau poste</div>
+            <label>N de poste (1 a <span id="form-max-num">10</span>)</label>
+            <input type="number" id="f-num" min="1" max="30" placeholder="1" oninput="onNumChange()">
+            <div id="final-warning" style="display:none;font-size:.75rem;color:var(--sand);margin-top:4px">Derniere balise = point final commun a tous</div>
+            <label>Nom</label>
+            <input id="f-name" placeholder="Ex : Crete Nord">
+            <label>Code balise</label>
+            <div class="flex gap-8">
+              <input id="f-code" placeholder="C01" style="font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-transform:uppercase">
+              <button class="btn btn-ghost btn-sm" onclick="autoCode()">AUTO</button>
+            </div>
+            <label>Nombre de questions</label>
+            <select id="f-qcount" onchange="onQCountChange()">
+              <option value="1">1 question</option>
+              <option value="2">2 questions</option>
+              <option value="3" selected>3 questions</option>
+            </select>
+            <label>Position de la balise sur la carte</label>
+            <div style="font-size:.72rem;color:var(--dim);margin-bottom:6px">Cliquez sur la carte pour placer la balise.</div>
+            <div class="flex gap-8" style="margin-bottom:6px">
+              <button class="btn btn-ghost btn-sm" onclick="centerAdminOnMe()">Ma position</button>
+              <button class="btn btn-ghost btn-sm" onclick="openFullscreenMap()">Plein ecran</button>
+            </div>
+            <div id="admin-map" style="height:200px;border-radius:4px;overflow:hidden;border:1px solid var(--border);cursor:crosshair"></div>
+            <div id="admin-map-coords" style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--khaki);margin-top:4px">Aucune position selectionnee</div>
+            <input type="hidden" id="f-lat">
+            <input type="hidden" id="f-lng">
+            <div id="questions-builder" class="mt-12"></div>
+            <div class="flex gap-8 mt-16">
+              <button class="btn btn-primary" onclick="savePoste()">Enregistrer</button>
+              <button class="btn btn-ghost" onclick="resetForm()">Annuler</button>
+            </div>
+            <input type="hidden" id="editing-id" value="">
+          </div>
+        </div>
+      </div>
+    </div>
         <div>
           <div class="card">
             <div class="card-title" id="form-title">Nouveau poste</div>
@@ -209,13 +254,7 @@ select option{background:var(--bg3)}
           <label>Pseudo</label>
           <input id="j-pseudo" placeholder="Ex : LECLERC" onkeydown="if(event.key==='Enter')addJoueur()">
           <label>Rotation</label>
-          <select id="j-order">
-            <option value="0">Rotation 1</option><option value="1">Rotation 2</option>
-            <option value="2">Rotation 3</option><option value="3">Rotation 4</option>
-            <option value="4">Rotation 5</option><option value="5">Rotation 6</option>
-            <option value="6">Rotation 7</option><option value="7">Rotation 8</option>
-            <option value="8">Rotation 9</option>
-          </select>
+          <select id="j-order"></select>
           <div style="font-size:.73rem;color:var(--dim);margin-top:6px">Determine l'ordre des postes 1-9. Poste 10 identique pour tous.</div>
           <button class="btn btn-primary mt-12 btn-full" onclick="addJoueur()">AJOUTER</button>
           <button class="btn btn-ghost btn-sm mt-8" onclick="genPseudo()">Pseudo aleatoire</button>
@@ -568,6 +607,7 @@ window.saveConfig = async function() {
   var s = document.getElementById("cfg-siteurl").value.trim(); if (s) CFG.siteUrl = s;
   var p = document.getElementById("cfg-pwd").value; if (p) CFG.pwd = p;
   await fbSet(rCfg(), CFG);
+  buildRotationSelect();
   alert("Configuration enregistree.");
 };
 function syncCfg() {
@@ -590,7 +630,7 @@ window.nav = function(v, btn) {
     document.getElementById("p-timer").textContent = fmtTime(CFG.duration * 60);
   }
 };
-var subViews = ["postes","joueurs","leaderboard","config"];
+var subViews = ["postes","joueurs","leaderboard","regles","config"];
 window.subNav = function(v) {
   subViews.forEach(function(s) {
     var el = document.getElementById("sub-" + s);
@@ -599,7 +639,10 @@ window.subNav = function(v) {
   if (v === "leaderboard") {
     loadLive(); startMapRefresh();
   } else if (v === "postes") {
-    setTimeout(function() { initAdminMap(); }, 300);
+    setTimeout(function() { initAdminMap(); initOverviewMap(); }, 300);
+    stopMapRefresh();
+  } else if (v === "joueurs") {
+    buildRotationSelect();
     stopMapRefresh();
   } else {
     stopMapRefresh();
@@ -744,6 +787,8 @@ window.savePoste = async function() {
   else postes.push(p);
   postes.sort(function(a,b) { return a.num - b.num; });
   renderPostes(); resetForm();
+  /* Rafraichir la carte globale */
+  setTimeout(function() { initOverviewMap(); }, 200);
 };
 function renderPostes() {
   var nb = CFG.nbPostes || 10;
@@ -1284,8 +1329,8 @@ var leafletMarkers = {};
 var mapRefreshInterval = null;
 var COLORS = ["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e22","#e91e63","#00bcd4","#8bc34a","#ff5722","#607d8b"];
 
-function rGps(pseudo) { return doc(DB, "ot_gps", pseudo); }
-function cGps()       { return collection(DB, "ot_gps"); }
+function rTrace(pseudo) { return doc(DB, "ot_traces", pseudo); }
+function cTraces()       { return collection(DB, "ot_traces"); }
 
 function startGPS() {
   if (!navigator.geolocation) return;
@@ -1615,7 +1660,9 @@ window.backToScan = function() {
 
 /* ── FINISH ── */
 window.doFinish = async function() {
-  clearInterval(pTimerInterval); clearInterval(pVisualInterval);
+  clearInterval(pTimerInterval); clearInterval(pVisualInterval); stopGPS();
+  /* Sauvegarder le trace et supprimer la position GPS temps reel */
+  await saveTraceAndCleanGPS();
   var rawElapsed = Math.floor((Date.now() - pStartTime) / 1000);
   var adjusted = Math.max(0, rawElapsed - pBonus);
   if (pElapsed === null) pElapsed = adjusted;
@@ -1684,6 +1731,7 @@ window.restart = function() {
   pStartTime = null; pElapsed = null;
   pCurrentPoste = null; pSelOpt = null; pQuestions = []; pQIdx = 0;
   pTrace = []; pMap = null; pPosMarker = null; pNextMarker = null;
+  pGpsTrace = [];
   clearInterval(pTimerInterval); clearInterval(pVisualInterval); stopGPS();
   ["s-login","s-scan","s-qcm","s-result"].forEach(function(id) { document.getElementById(id).style.display = "none"; });
   document.getElementById("s-login").style.display = "block";
@@ -1701,7 +1749,14 @@ function renderAll() { renderPostes(); renderJoueurs(); }
   document.getElementById("app-loading").style.display = "none";
   document.getElementById("app-root").style.display = "block";
   document.getElementById("p-timer").textContent = fmtTime(CFG.duration * 60);
+  /* Init formulaire poste */
+  var nb = CFG.nbPostes || 10;
+  var maxEl = document.getElementById("form-max-num");
+  if (maxEl) maxEl.textContent = nb;
+  var totalEl = document.getElementById("postes-total");
+  if (totalEl) totalEl.textContent = nb;
   buildQuestionsUI(3, null);
+  buildRotationSelect();
   var params = new URLSearchParams(location.search);
   var lp = params.get("login");
   if (lp) {
