@@ -411,11 +411,10 @@ select option{background:var(--bg3)}
 <div id="view-regles" class="view">
   <div class="card">
     <div class="card-title">Documentation — COPA</div>
-    <!-- Onglets -->
     <div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-primary btn-sm" id="r-tab-std-btn"    onclick="switchReglesTab('standard')">Reglement standard</button>
-      <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn"  onclick="switchReglesTab('custom')">Regles personnalisees</button>
-      <button class="btn btn-ghost  btn-sm" id="r-tab-notice-btn"  onclick="switchReglesTab('notice')">Notice admin</button>
+      <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn"  onclick="switchReglesTab('custom')" style="display:none">Regles personnalisees</button>
+      <button class="btn btn-ghost  btn-sm" id="r-tab-notice-btn"  onclick="switchReglesTab('notice')" style="display:none">Notice admin</button>
     </div>
 
     <!-- REGLEMENT STANDARD -->
@@ -711,6 +710,9 @@ window.checkPwd=function(){
   if(document.getElementById("admin-pwd-inp").value===CFG.pwd){
     document.getElementById("admin-guard").style.display="none";
     document.getElementById("admin-content").style.display="block";
+    /* Afficher les onglets admin dans les regles */
+    document.getElementById("r-tab-custom-btn").style.display="inline-block";
+    document.getElementById("r-tab-notice-btn").style.display="inline-block";
     syncCfg();renderAll();
     subNav("postes",document.querySelector(".sub-tab"));
   }else{document.getElementById("pwd-err").textContent="Mot de passe incorrect.";}
@@ -720,6 +722,11 @@ window.adminLogout=function(){
   document.getElementById("admin-content").style.display="none";
   document.getElementById("admin-pwd-inp").value="";
   document.getElementById("pwd-err").textContent="";
+  /* Masquer les onglets admin dans les regles */
+  document.getElementById("r-tab-custom-btn").style.display="none";
+  document.getElementById("r-tab-notice-btn").style.display="none";
+  /* Revenir sur l'onglet standard */
+  switchReglesTab("standard");
   stopMapRefresh();
 };
 window.saveConfig=async function(){
@@ -1054,7 +1061,7 @@ window.openFsMap=async function(){
     var elat=parseFloat(document.getElementById("f-lat").value)||46.5;
     var elng=parseFloat(document.getElementById("f-lng").value)||2.5;
     var zoom=document.getElementById("f-lat").value?15:6;
-    fsMap=L.map("fs-map").setView([elat,elng],zoom);
+    fsMap=L.map("fs-map",{zoomControl:true}).setView([elat,elng],zoom);
     ignTile().addTo(fsMap);
     fsMap.on("click",function(e){placeFsMarker(e.latlng.lat,e.latlng.lng);});
     if(!document.getElementById("f-lat").value)centerFsOnMe();
