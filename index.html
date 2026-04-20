@@ -709,7 +709,6 @@ async function selectCourse(id){
     var snap = await getDoc(rCourse(currentUser.uid,id));
     if(!snap.exists()){ alert("Course introuvable."); return; }
     currentCourse = Object.assign({id:id}, snap.data());
-    /* Sauvegarder la derniere course */
     await fbSet(doc(DB,"users",currentUser.uid),{lastCourseId:id},{merge:true});
     await loadCourseData();
     document.getElementById("no-course-msg").style.display="none";
@@ -717,12 +716,14 @@ async function selectCourse(id){
     document.getElementById("course-badge").textContent="Course : "+currentCourse.code;
     syncCfg(); updateFormMax(); buildRotationSelect();
     renderAll();
+    closeCourseModal();
     subNav("postes",document.querySelector(".sub-tab"));
   } catch(e) {
     console.error("Erreur selectCourse:", e);
-    alert("Erreur de chargement : "+e.message);
+    alert("Erreur : "+e.message);
   }
 }
+window.selectCourse = selectCourse;
 
 async function loadCourseData(){
   if(!currentUser||!currentCourse) return;
