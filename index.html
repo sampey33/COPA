@@ -11,6 +11,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(to right,#002395 33%,white 33%,white 66%,#ED2939 66%);}
 .logo{font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--sand);letter-spacing:4px;white-space:nowrap}
 .tabs{display:flex;gap:2px;flex-shrink:0}
 .tab{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;background:transparent;border:1px solid transparent;color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap}
