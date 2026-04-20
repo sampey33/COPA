@@ -440,7 +440,7 @@ select option{background:var(--bg3)}
     <div class="card-title">Regles du jeu — COPA</div>
     <div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-primary btn-sm" id="r-tab-std-btn"   onclick="switchReglesTab('standard')">Reglement standard</button>
-      <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn" onclick="switchReglesTab('custom')">Regles personnalisees</button>
+      <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn" onclick="switchReglesTab('custom')">Message de l'organisateur</button>
     </div>
     <div id="r-view-standard">
       <div style="line-height:1.8;font-size:.9rem">
@@ -465,7 +465,7 @@ select option{background:var(--bg3)}
     </div>
     <div id="r-view-custom" style="display:none">
       <div id="custom-rules-display" style="line-height:1.8;font-size:.9rem;white-space:pre-wrap;color:var(--text)"></div>
-      <div id="custom-rules-empty" style="color:var(--dim);font-size:.85rem;font-style:italic">Aucune regle personnalisee pour cette course.</div>
+      <div id="custom-rules-empty" style="color:var(--dim);font-size:.85rem;font-style:italic">Aucun message de l'organisateur pour cette course.</div>
     </div>
   </div>
 </div>
@@ -1065,7 +1065,7 @@ window.openFsMap=async function(){
     var elng=parseFloat(document.getElementById("f-lng").value)||2.5;
     var zoom=document.getElementById("f-lat").value?15:6;
     fsMap=makeMap("fs-map",elat,elng,zoom);
-    L.control.zoom({position:"topright"}).addTo(fsMap);
+    L.control.zoom({position:"topleft"}).addTo(fsMap);
     satTile().addTo(fsMap);
     fsMap.on("click",function(e){placeFsMarker(e.latlng.lat,e.latlng.lng);});
     if(!document.getElementById("f-lat").value)centerFsOnMe();
