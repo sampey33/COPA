@@ -410,33 +410,176 @@ select option{background:var(--bg3)}
 <!-- ========== REGLES ========== -->
 <div id="view-regles" class="view">
   <div class="card">
-    <div class="card-title">Regles du jeu — COPA</div>
-    <div style="line-height:1.8;font-size:.9rem">
-      <div class="rule-section-title">Objectif</div>
-      <p>Chaque participant doit trouver et valider toutes les balises disseminees sur le terrain dans un temps imparti. A chaque balise, il repond a des questions tactiques ou techniques. Son temps final est ajuste en fonction de ses reponses.</p>
-      <div class="rule-section-title">Deroulement</div>
-      <p>Avant le depart, l'encadrant remet a chaque participant son QR code personnel. Le participant scanne ce QR code pour se connecter a l'application et demarrer son chronometre.</p>
-      <p style="margin-top:8px">Chaque participant suit un ordre de passage different sur les balises intermediaires afin d'eviter que les equipes se suivent. La derniere balise est le point de controle final commun a tous.</p>
-      <p style="margin-top:8px">Sur chaque balise, un code est affiche. Le participant saisit ce code dans l'application. Les questions s'affichent une par une. Il n'a qu'une seule chance de repondre, sans retour possible.</p>
-      <div class="rule-section-title">Systeme de bonus et malus</div>
-      <div class="rule-bonus-box">
-        <div class="rule-bonus" style="background:rgba(39,174,96,.15);border:1px solid var(--green)">
-          <div style="font-size:1.3rem;font-weight:700;color:#2ecc71">+1 min</div>
-          <div style="font-size:.78rem;color:var(--dim)">par bonne reponse</div>
+    <div class="card-title">Documentation — COPA</div>
+    <!-- Onglets -->
+    <div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" id="r-tab-std-btn"    onclick="switchReglesTab('standard')">Reglement standard</button>
+      <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn"  onclick="switchReglesTab('custom')">Regles personnalisees</button>
+      <button class="btn btn-ghost  btn-sm" id="r-tab-notice-btn"  onclick="switchReglesTab('notice')">Notice admin</button>
+    </div>
+
+    <!-- REGLEMENT STANDARD -->
+    <div id="r-view-standard">
+      <div style="line-height:1.8;font-size:.9rem">
+        <div class="rule-section-title">Objectif</div>
+        <p>Chaque participant doit trouver et valider toutes les balises disseminees sur le terrain dans un temps imparti. A chaque balise, il repond a des questions tactiques ou techniques. Son temps final est ajuste en fonction de ses reponses.</p>
+        <div class="rule-section-title">Deroulement</div>
+        <p>Avant le depart, l'encadrant remet a chaque participant son QR code personnel. Le participant scanne ce QR code pour se connecter a l'application et demarrer son chronometre.</p>
+        <p style="margin-top:8px">Chaque participant suit un ordre de passage different sur les balises intermediaires afin d'eviter que les equipes se suivent. La derniere balise est le point de controle final commun a tous.</p>
+        <p style="margin-top:8px">Sur chaque balise, un code est affiche. Le participant saisit ce code dans l'application. Les questions s'affichent une par une. Il n'a qu'une seule chance de repondre, sans retour possible.</p>
+        <div class="rule-section-title">Systeme de bonus et malus</div>
+        <div class="rule-bonus-box">
+          <div class="rule-bonus" style="background:rgba(39,174,96,.15);border:1px solid var(--green)">
+            <div style="font-size:1.3rem;font-weight:700;color:#2ecc71">+1 min</div>
+            <div style="font-size:.78rem;color:var(--dim)">par bonne reponse</div>
+          </div>
+          <div class="rule-bonus" style="background:rgba(192,57,43,.12);border:1px solid var(--red)">
+            <div style="font-size:1.3rem;font-weight:700;color:#e74c3c">-1 min</div>
+            <div style="font-size:.78rem;color:var(--dim)">par mauvaise reponse</div>
+          </div>
         </div>
-        <div class="rule-bonus" style="background:rgba(192,57,43,.12);border:1px solid var(--red)">
-          <div style="font-size:1.3rem;font-weight:700;color:#e74c3c">-1 min</div>
-          <div style="font-size:.78rem;color:var(--dim)">par mauvaise reponse</div>
+        <p>Temps final = temps brut - bonnes reponses x 60s + mauvaises reponses x 60s.</p>
+        <div class="rule-section-title">Classement</div>
+        <p>Le classement est etabli par nombre de balises validees puis par temps final ajuste. En cas d'egalite, le meilleur temps est classe premier.</p>
+        <div class="rule-section-title">Regles a respecter</div>
+        <p>Le participant progresse seul, sans aide exterieure. Toute communication sur les codes ou les reponses est interdite. L'encadrant peut arreter le chronometre d'un participant a tout moment.</p>
+        <div class="rule-section-title">Navigation</div>
+        <p>L'application integre une boussole GPS indiquant la direction et la distance vers la prochaine balise. Le participant doit autoriser la localisation sur son telephone.</p>
+      </div>
+    </div>
+
+    <!-- REGLES PERSONNALISEES -->
+    <div id="r-view-custom" style="display:none">
+      <div id="custom-rules-display" style="line-height:1.8;font-size:.9rem;white-space:pre-wrap"></div>
+      <div id="custom-rules-empty" style="color:var(--dim);font-size:.85rem;font-style:italic">Aucune regle personnalisee. Connectez-vous en admin pour en ajouter.</div>
+      <div id="custom-rules-editor" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin-bottom:8px">Modifier les regles personnalisees</div>
+        <textarea id="custom-rules-input" style="min-height:200px;font-size:.9rem;line-height:1.7" placeholder="Ecrivez ici vos regles specifiques a cette course..."></textarea>
+        <div class="flex gap-8 mt-8">
+          <button class="btn btn-primary" onclick="saveCustomRules()">Enregistrer</button>
+          <button class="btn btn-ghost"   onclick="cancelCustomRules()">Annuler</button>
         </div>
       </div>
-      <p>Temps final = temps brut - bonnes reponses x 60s + mauvaises reponses x 60s.</p>
-      <div class="rule-section-title">Classement</div>
-      <p>Le classement est etabli par nombre de balises validees puis par temps final ajuste. En cas d'egalite, le meilleur temps est classe premier.</p>
-      <div class="rule-section-title">Regles a respecter</div>
-      <p>Le participant progresse seul, sans aide exterieure. Toute communication sur les codes ou les reponses est interdite. L'encadrant peut arreter le chronometre d'un participant a tout moment.</p>
-      <div class="rule-section-title">Navigation</div>
-      <p>L'application integre une boussole GPS indiquant la direction et la distance vers la prochaine balise. Le participant doit autoriser la localisation sur son telephone.</p>
+      <div id="custom-rules-edit-btn" style="display:none;margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="editCustomRules()">Modifier les regles</button>
+      </div>
     </div>
+
+    <!-- NOTICE ADMIN -->
+    <div id="r-view-notice" style="display:none">
+      <div style="line-height:1.8;font-size:.9rem">
+
+        <div style="background:rgba(200,184,130,.08);border:1px solid var(--khaki);border-radius:4px;padding:14px;margin-bottom:16px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sand);margin-bottom:4px">Notice d'utilisation — COPA</div>
+          <div style="font-size:.78rem;color:var(--dim)">Guide complet pour organiser une course d'orientation avec COPA.</div>
+        </div>
+
+        <!-- ETAPE 1 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">1</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Configuration generale</div>
+            <p>Allez dans <strong>Admin → Config</strong> et renseignez :</p>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>Le nom de la course et votre unite</li>
+              <li>La duree du chronometre (en minutes)</li>
+              <li>Le nombre de balises total</li>
+              <li>L'URL de votre site GitHub Pages (pour les QR codes)</li>
+              <li>Votre mot de passe admin</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETAPE 2 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">2</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Creation des postes</div>
+            <p>Allez dans <strong>Admin → Postes</strong> et creez chaque balise :</p>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>Numerotez les postes de 1 au nombre total choisi</li>
+              <li>Le dernier poste (n° max) est automatiquement le point final commun</li>
+              <li>Donnez un nom parlant a chaque balise (ex : Crete Nord, Carrefour Bravo)</li>
+              <li>Definissez un code court qui sera affiche sur la balise terrain (ex : C01)</li>
+              <li>Choisissez 1, 2 ou 3 questions par balise</li>
+              <li>Cliquez sur la carte satellite pour placer la balise (active la boussole GPS des participants)</li>
+              <li>Redigez vos questions et cochez la bonne reponse</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETAPE 3 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">3</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Creation des joueurs</div>
+            <p>Allez dans <strong>Admin → Joueurs</strong> :</p>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>Creez un joueur par participant avec son pseudo ou matricule</li>
+              <li>Attribuez une rotation differente a chaque participant pour eviter qu'ils se suivent</li>
+              <li>Cliquez sur <strong>QR</strong> pour afficher le QR code personnel du joueur</li>
+              <li>Imprimez et remettez le QR code au participant avant le depart</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETAPE 4 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">4</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Preparation du terrain</div>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>Placez les balises aux positions configurees sur la carte</li>
+              <li>Affichez le code de chaque balise de facon visible (ex : C01 sur une feuille plastifiee)</li>
+              <li>Le code doit etre lisible mais pas le nom du poste</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETAPE 5 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">5</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Lancement de la course</div>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>Chaque participant scanne son QR code avec son telephone</li>
+              <li>Le site s'ouvre automatiquement et le chrono demarre</li>
+              <li>Le participant autorise la localisation pour la boussole GPS</li>
+              <li>Il navigue vers chaque balise grace a la boussole, saisit le code et repond aux questions</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ETAPE 6 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="min-width:32px;height:32px;border-radius:50%;background:var(--khaki);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">6</div>
+          <div>
+            <div class="rule-section-title" style="margin-top:0">Suivi en temps reel</div>
+            <p>Allez dans <strong>Admin → Classement</strong> :</p>
+            <ul style="margin:8px 0 0 16px;line-height:2">
+              <li>La carte GPS affiche la position de chaque participant en temps reel</li>
+              <li>Le suivi detaille montre les reponses correctes (V) et incorrectes (X) par balise</li>
+              <li>Vous pouvez arreter le chrono d'un participant a tout moment</li>
+              <li>Le classement final se met a jour automatiquement</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CONSEILS -->
+        <div style="background:rgba(39,174,96,.08);border:1px solid var(--green);border-radius:4px;padding:14px;margin-top:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2ecc71;margin-bottom:8px">Conseils pratiques</div>
+          <ul style="font-size:.85rem;line-height:2;margin-left:16px">
+            <li>Testez l'application la veille avec un faux joueur pour verifier que tout fonctionne</li>
+            <li>Assurez-vous que le terrain a un minimum de reseau 4G pour la synchronisation GPS</li>
+            <li>Prevoyez des batteries externes pour les participants</li>
+            <li>Le code doit etre en MAJUSCULES sur la balise (ex : C01 et non c01)</li>
+            <li>Utilisez le bouton "Reinitialiser" apres chaque course pour effacer les donnees</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -475,12 +618,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebas
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 var FBAPP = initializeApp({
-  apiKey:"AIzaSyAeEkqBZefQYjPChESHv_fJ692P2A494wo",
-  authDomain:"charlie-co.firebaseapp.com",
-  projectId:"charlie-co",
-  storageBucket:"charlie-co.firebasestorage.app",
-  messagingSenderId:"569262898500",
-  appId:"1:569262898500:web:5852e2aafd05ad4e89eb11"
+  apiKey:"AIzaSyDGp-5TzCmHcLBo8zgzLh_3BobmZDJKzTc",
+  authDomain:"copa-fb6ef.firebaseapp.com",
+  projectId:"copa-fb6ef",
+  storageBucket:"copa-fb6ef.firebasestorage.app",
+  messagingSenderId:"637750106008",
+  appId:"1:637750106008:web:0272c3325308a0885abded"
 });
 var DB = getFirestore(FBAPP);
 
@@ -533,7 +676,13 @@ async function loadLeaflet(){
   var lc=document.createElement("link");lc.rel="stylesheet";lc.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(lc);
   await new Promise(function(res){var s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=res;document.head.appendChild(s);});
 }
-function ignTile(){return L.tileLayer("https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}",{attribution:"IGN-F/Geoportail",maxZoom:18,tileSize:256});}
+function ignTile(){
+  return L.tileLayer("https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",{
+    attribution:"Google Satellite",
+    subdomains:["mt0","mt1","mt2","mt3"],
+    maxZoom:21
+  });
+}
 
 /* ── NAV PRINCIPALE ── */
 window.navMain=function(v,btn){
@@ -819,7 +968,25 @@ async function initAdminMap(){
   var elat=parseFloat(document.getElementById("f-lat").value);
   var elng=parseFloat(document.getElementById("f-lng").value);
   if(!isNaN(elat)&&!isNaN(elng)){placeAdminMarker(elat,elng);adminMap.setView([elat,elng],15);}
-  else if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(pos){adminMap.setView([pos.coords.latitude,pos.coords.longitude],15);},null,{enableHighAccuracy:true,timeout:5000});}
+  /* Geolocalisation automatique avec marqueur position */
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      adminMap.setView([pos.coords.latitude,pos.coords.longitude],15);
+      /* Marqueur croix bleue position admin */
+      var posIcon=L.divIcon({
+        className:"",
+        html:'<div style="position:relative;width:24px;height:24px">'
+          +'<div style="position:absolute;top:50%;left:0;right:0;height:3px;background:#3498db;transform:translateY(-50%)"></div>'
+          +'<div style="position:absolute;left:50%;top:0;bottom:0;width:3px;background:#3498db;transform:translateX(-50%)"></div>'
+          +'<div style="position:absolute;inset:4px;border-radius:50%;border:2px solid #3498db;background:rgba(52,152,219,.25)"></div>'
+          +'</div>',
+        iconAnchor:[12,12]
+      });
+      if(window._adminPosMarker)adminMap.removeLayer(window._adminPosMarker);
+      window._adminPosMarker=L.marker([pos.coords.latitude,pos.coords.longitude],{icon:posIcon,zIndexOffset:500})
+        .addTo(adminMap).bindPopup("Votre position");
+    },null,{enableHighAccuracy:true,timeout:8000});
+  }
   adminMap.on("click",function(e){
     document.getElementById("f-lat").value=e.latlng.lat.toFixed(6);
     document.getElementById("f-lng").value=e.latlng.lng.toFixed(6);
@@ -835,7 +1002,22 @@ function placeAdminMarker(lat,lng){
 }
 window.centerAdminOnMe=function(){
   if(!navigator.geolocation){alert("Geolocalisation non disponible.");return;}
-  navigator.geolocation.getCurrentPosition(function(pos){if(adminMap)adminMap.setView([pos.coords.latitude,pos.coords.longitude],16);},null,{enableHighAccuracy:true,timeout:5000});
+  navigator.geolocation.getCurrentPosition(function(pos){
+    if(!adminMap)return;
+    adminMap.setView([pos.coords.latitude,pos.coords.longitude],16);
+    var posIcon=L.divIcon({
+      className:"",
+      html:'<div style="position:relative;width:24px;height:24px">'
+        +'<div style="position:absolute;top:50%;left:0;right:0;height:3px;background:#3498db;transform:translateY(-50%)"></div>'
+        +'<div style="position:absolute;left:50%;top:0;bottom:0;width:3px;background:#3498db;transform:translateX(-50%)"></div>'
+        +'<div style="position:absolute;inset:4px;border-radius:50%;border:2px solid #3498db;background:rgba(52,152,219,.25)"></div>'
+        +'</div>',
+      iconAnchor:[12,12]
+    });
+    if(window._adminPosMarker)adminMap.removeLayer(window._adminPosMarker);
+    window._adminPosMarker=L.marker([pos.coords.latitude,pos.coords.longitude],{icon:posIcon,zIndexOffset:500})
+      .addTo(adminMap).bindPopup("Votre position");
+  },function(){alert("Impossible d'obtenir votre position.");},{enableHighAccuracy:true,timeout:8000});
 };
 
 async function initOverviewMap(){
@@ -1066,14 +1248,77 @@ window.resetAll=async function(){
   var pp=await getDocs(cProgress());pp.forEach(function(d){deleteDoc(doc(DB,"ot_progress",d.id));});
   var gg=await getDocs(cGps());gg.forEach(function(d){deleteDoc(doc(DB,"ot_gps",d.id));});
   var tt=await getDocs(cTraces());tt.forEach(function(d){deleteDoc(doc(DB,"ot_traces",d.id));});
-  sessions=[];liveGpsMarkers={};
+  sessions=[];
+  /* Supprimer les marqueurs GPS de la carte */
+  if(liveGpsMap){
+    Object.keys(liveGpsMarkers).forEach(function(k){
+      try{liveGpsMap.removeLayer(liveGpsMarkers[k]);}catch(e){}
+    });
+  }
+  liveGpsMarkers={};
+  /* Vider la legende */
+  var legend=document.getElementById("map-legend");
+  if(legend)legend.innerHTML="";
   document.getElementById("lb-list").innerHTML='<div style="color:var(--dim);font-size:.85rem">Aucun resultat.</div>';
   document.getElementById("live-list").innerHTML='<div style="color:var(--dim);font-size:.85rem">Aucun participant.</div>';
   document.getElementById("stop-list").innerHTML='<div style="color:var(--dim);font-size:.85rem">Aucun chrono actif.</div>';
   alert("Reinitialisation terminee.");
 };
 
-/* ── ROTATION ── */
+function rRegles() { return doc(DB,"ot","regles"); }
+
+/* ── NAV REGLES ── */
+window.switchReglesTab=function(tab){
+  document.getElementById("r-view-standard").style.display = tab==="standard" ? "block" : "none";
+  document.getElementById("r-view-custom").style.display   = tab==="custom"   ? "block" : "none";
+  document.getElementById("r-view-notice").style.display   = tab==="notice"   ? "block" : "none";
+  document.getElementById("r-tab-std-btn").className    = "btn btn-sm "+(tab==="standard"?"btn-primary":"btn-ghost");
+  document.getElementById("r-tab-custom-btn").className = "btn btn-sm "+(tab==="custom"   ?"btn-primary":"btn-ghost");
+  document.getElementById("r-tab-notice-btn").className = "btn btn-sm "+(tab==="notice"   ?"btn-primary":"btn-ghost");
+  if(tab==="custom") loadCustomRules();
+};
+
+async function loadCustomRules(){
+  try{
+    var snap=await getDoc(rRegles());
+    var text=snap.exists()?(snap.data().text||""):"";
+    var display=document.getElementById("custom-rules-display");
+    var empty  =document.getElementById("custom-rules-empty");
+    var editBtn=document.getElementById("custom-rules-edit-btn");
+    var input  =document.getElementById("custom-rules-input");
+    if(text){
+      display.textContent=text;display.style.display="block";
+      empty.style.display="none";
+    }else{
+      display.style.display="none";empty.style.display="block";
+    }
+    input.value=text;
+    /* Bouton edition visible seulement si admin connecte */
+    if(document.getElementById("admin-content").style.display!=="none"){
+      editBtn.style.display="block";
+    }
+  }catch(e){}
+}
+
+window.editCustomRules=function(){
+  document.getElementById("custom-rules-editor").style.display="block";
+  document.getElementById("custom-rules-edit-btn").style.display="none";
+};
+window.cancelCustomRules=function(){
+  document.getElementById("custom-rules-editor").style.display="none";
+  document.getElementById("custom-rules-edit-btn").style.display="block";
+};
+window.saveCustomRules=async function(){
+  var text=document.getElementById("custom-rules-input").value.trim();
+  await fbSet(rRegles(),{text:text,updatedAt:new Date().toISOString()});
+  document.getElementById("custom-rules-editor").style.display="none";
+  document.getElementById("custom-rules-edit-btn").style.display="block";
+  var display=document.getElementById("custom-rules-display");
+  var empty  =document.getElementById("custom-rules-empty");
+  if(text){display.textContent=text;display.style.display="block";empty.style.display="none";}
+  else{display.style.display="none";empty.style.display="block";}
+  alert("Regles enregistrees.");
+};
 function getRoute(j){
   var inter=postes.filter(function(p){return !p.isFinal;}).sort(function(a,b){return a.num-b.num;});
   var finale=postes.find(function(p){return p.isFinal;});
