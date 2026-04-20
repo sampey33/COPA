@@ -682,6 +682,9 @@ function ignTile(){
     maxZoom:21
   });
 }
+function makeMap(id, lat, lng, zoom){
+  return L.map(id, {zoomControl:false}).setView([lat, lng], zoom);
+}
 
 /* ── NAV PRINCIPALE ── */
 window.navMain=function(v,btn){
@@ -1031,7 +1034,7 @@ async function initOverviewMap(){
   await loadLeaflet();
   var container=document.getElementById("overview-map");if(!container)return;
   if(!overviewMap){
-    overviewMap=L.map("overview-map").setView([46.5,2.5],6);
+    overviewMap=makeMap("overview-map",46.5,2.5,6);
     ignTile().addTo(overviewMap);
     if(navigator.geolocation){
       navigator.geolocation.getCurrentPosition(function(pos){
@@ -1061,7 +1064,8 @@ window.openFsMap=async function(){
     var elat=parseFloat(document.getElementById("f-lat").value)||46.5;
     var elng=parseFloat(document.getElementById("f-lng").value)||2.5;
     var zoom=document.getElementById("f-lat").value?15:6;
-    fsMap=L.map("fs-map",{zoomControl:true}).setView([elat,elng],zoom);
+    fsMap=makeMap("fs-map",elat,elng,zoom);
+    L.control.zoom({position:"topright"}).addTo(fsMap);
     ignTile().addTo(fsMap);
     fsMap.on("click",function(e){placeFsMarker(e.latlng.lat,e.latlng.lng);});
     if(!document.getElementById("f-lat").value)centerFsOnMe();
@@ -1100,7 +1104,7 @@ async function initLiveGpsMap(gpsData){
   await loadLeaflet();
   var container=document.getElementById("live-gps-map");if(!container)return;
   if(!liveGpsMap){
-    liveGpsMap=L.map("live-gps-map").setView([46.5,2.5],6);
+    liveGpsMap=makeMap("live-gps-map",46.5,2.5,6);
     ignTile().addTo(liveGpsMap);
   }else{liveGpsMap.invalidateSize();}
   var legend=document.getElementById("map-legend");if(legend)legend.innerHTML="";
