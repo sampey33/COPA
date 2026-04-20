@@ -705,18 +705,23 @@ window.deleteCourse = async function(id,code){
 };
 
 async function selectCourse(id){
-  var snap = await getDoc(rCourse(currentUser.uid,id));
-  if(!snap.exists()) return;
-  currentCourse = Object.assign({id:id}, snap.data());
-  /* Sauvegarder la derniere course */
-  await fbSet(doc(DB,"users",currentUser.uid),{lastCourseId:id},{merge:true});
-  await loadCourseData();
-  document.getElementById("no-course-msg").style.display="none";
-  document.getElementById("admin-panels").style.display="block";
-  document.getElementById("course-badge").textContent="Course : "+currentCourse.code;
-  syncCfg(); updateFormMax(); buildRotationSelect();
-  renderAll();
-  subNav("postes",document.querySelector(".sub-tab"));
+  try {
+    var snap = await getDoc(rCourse(currentUser.uid,id));
+    if(!snap.exists()){ alert("Course introuvable."); return; }
+    currentCourse = Object.assign({id:id}, snap.data());
+    /* Sauvegarder la derniere course */
+    await fbSet(doc(DB,"users",currentUser.uid),{lastCourseId:id},{merge:true});
+    await loadCourseData();
+    document.getElementById("no-course-msg").style.display="none";
+    document.getElementById("admin-panels").style.display="block";
+    document.getElementById("course-badge").textContent="Course : "+currentCourse.code;
+    syncCfg(); updateFormMax(); buildRotationSelect();
+    renderAll();
+    subNav("postes",document.querySelector(".sub-tab"));
+  } catch(e) {
+    console.error("Erreur selectCourse:", e);
+    alert("Erreur de chargement : "+e.message);
+  }
 }
 
 async function loadCourseData(){
