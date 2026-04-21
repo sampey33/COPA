@@ -504,6 +504,18 @@ select option{background:var(--bg3)}
   </div>
 </div>
 
+<!-- MODAL RESET MOT DE PASSE -->
+<div class="overlay" id="reset-pwd-overlay">
+  <div class="modal" style="max-width:380px">
+    <h3>Nouveau mot de passe</h3>
+    <p style="color:var(--dim);font-size:.82rem;margin-bottom:16px">Choisissez un nouveau mot de passe pour votre compte.</p>
+    <input type="password" id="reset-pwd-input" placeholder="Nouveau mot de passe (6 caractères min)" style="margin-bottom:8px">
+    <input type="password" id="reset-pwd-confirm" placeholder="Confirmer le mot de passe" style="margin-bottom:12px">
+    <button class="btn btn-primary btn-full" onclick="doResetPassword()">Enregistrer</button>
+    <div class="err-msg" id="reset-pwd-err" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <!-- CARTE PLEIN ECRAN -->
 <div id="fs-map-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);flex-direction:column">
   <div style="background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -522,7 +534,7 @@ select option{background:var(--bg3)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, sendPasswordResetEmail, confirmPasswordReset, verifyPasswordResetCode } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
 var FBAPP = initializeApp({
   apiKey:"AIzaSyDGp-5TzCmHcLBo8zgzLh_3BobmZDJKzTc",
@@ -534,6 +546,51 @@ var FBAPP = initializeApp({
 });
 var DB   = getFirestore(FBAPP);
 var AUTH = getAuth(FBAPP);
+
+/* ── GESTION LIEN RESET MOT DE PASSE ── */
+(function handleResetLink(){
+  var params = new URLSearchParams(location.search);
+  var mode   = params.get("mode");
+  var oobCode= params.get("oobCode");
+  if(mode === "resetPassword" && oobCode){
+    window._resetOobCode = oobCode;
+    /* Vérifier que le code est valide */
+    verifyPasswordResetCode(AUTH, oobCode).then(function(email){
+      window._resetEmail = email;
+      document.getElementById("reset-pwd-overlay").classList.add("open");
+      /* Nettoyer l'URL */
+      history.replaceState({}, "", location.pathname);
+    }).catch(function(){
+      alert("Ce lien de réinitialisation est invalide ou a expiré. Veuillez en demander un nouveau.");
+    });
+  }
+})();
+
+window.doResetPassword = async function(){
+  var pwd     = document.getElementById("reset-pwd-input").value;
+  var confirm = document.getElementById("reset-pwd-confirm").value;
+  var errEl   = document.getElementById("reset-pwd-err");
+  errEl.textContent = "";
+  if(pwd.length < 6){ errEl.textContent = "Le mot de passe doit faire au moins 6 caractères."; return; }
+  if(pwd !== confirm){ errEl.textContent = "Les mots de passe ne correspondent pas."; return; }
+  try{
+    await confirmPasswordReset(AUTH, window._resetOobCode, pwd);
+    document.getElementById("reset-pwd-overlay").classList.remove("open");
+    document.getElementById("reset-pwd-input").value = "";
+    document.getElementById("reset-pwd-confirm").value = "";
+    alert("Mot de passe modifié avec succès ! Vous pouvez maintenant vous connecter.");
+  }catch(e){
+    errEl.textContent = "Erreur : " + e.message;
+  }
+};
+
+/* Cacher le bouton Google sur Android (WebView ne supporte pas signInWithPopup) */
+if(window.Capacitor && window.Capacitor.isNativePlatform()){
+  var gBtn = document.querySelector('.btn-google');
+  if(gBtn){ gBtn.style.display = 'none'; }
+  var sep = document.querySelector('.auth-sep');
+  if(sep){ sep.style.display = 'none'; }
+}
 
 /* ── REFS (toutes les donnees sous /users/{uid}/courses/{courseId}/) ── */
 function rCourse(uid,cid)      { return doc(DB,"users",uid,"courses",cid); }
@@ -810,8 +867,15 @@ window.createAccount = async function(){
 window.resetPassword = async function(){
   var email = document.getElementById("auth-email").value.trim();
   if(!email){ document.getElementById("auth-err").textContent="Entrez votre email d'abord."; return; }
-  try{ await sendPasswordResetEmail(AUTH,email); alert("Email de reinitialisation envoye !"); }
-  catch(e){ document.getElementById("auth-err").textContent=e.message; }
+  try{ 
+    await sendPasswordResetEmail(AUTH,email); 
+    document.getElementById("auth-err").style.color="var(--sand)";
+    document.getElementById("auth-err").textContent="Email envoyé ! Vérifiez aussi votre dossier spam.";
+  }
+  catch(e){ 
+    document.getElementById("auth-err").style.color="#e74c3c";
+    document.getElementById("auth-err").textContent=e.message; 
+  }
 };
 
 window.signOut = async function(){
