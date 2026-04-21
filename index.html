@@ -190,7 +190,7 @@ select option{background:var(--bg3)}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div class="user-badge" id="user-badge">-</div>
       <div class="flex gap-8">
-        <span id="course-badge" style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--green)"></span>
+        <span id="course-badge" style="font-family:'Share Tech Mono',monospace;font-size:.95rem;font-weight:700;color:var(--sand);letter-spacing:2px;background:var(--olive-dark);border:1px solid var(--khaki);border-radius:3px;padding:4px 10px"></span>
         <button class="btn btn-ghost btn-sm" onclick="showCourseManager()">Mes courses</button>
         <button class="btn btn-danger btn-sm" onclick="signOut()">Deconnexion</button>
       </div>
@@ -1757,17 +1757,44 @@ function startTimer(){
 }
 
 /* ── GPS ── */
-function startGPS(){if(!navigator.geolocation)return;sendGPS();pGpsInterval=setInterval(sendGPS,30000);}
-function stopGPS(){clearInterval(pGpsInterval);pGpsInterval=null;}
-function sendGPS(){
-  if(!pJoueur||!window._pUid)return;
-  navigator.geolocation.getCurrentPosition(function(pos){
-    lastUserLat=pos.coords.latitude;lastUserLng=pos.coords.longitude;window.lastGpsAccuracy=Math.round(pos.coords.accuracy);
-    pGpsTrace.push({lat:pos.coords.latitude,lng:pos.coords.longitude,t:new Date().toISOString()});
-    fbSet(rGps(window._pUid,window._pCid,pJoueur.pseudo),{pseudo:pJoueur.pseudo,lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:Math.round(pos.coords.accuracy),updatedAt:new Date().toISOString(),startTime:pStartTime,bonus:pBonus});
+function startGPS(){
+  if(!navigator.geolocation)return;
+  /* Utiliser watchPosition pour une mise à jour continue (~1s) */
+  pGpsInterval = navigator.geolocation.watchPosition(function(pos){
+    lastUserLat = pos.coords.latitude;
+    lastUserLng = pos.coords.longitude;
+    window.lastGpsAccuracy = Math.round(pos.coords.accuracy);
+    pGpsTrace.push({lat:pos.coords.latitude, lng:pos.coords.longitude, t:new Date().toISOString()});
+    /* Envoyer la position à Firebase toutes les 15s max pour ne pas saturer */
+    var now = Date.now();
+    if(!window._lastGpsSend || now - window._lastGpsSend > 15000){
+      window._lastGpsSend = now;
+      fbSet(rGps(window._pUid, window._pCid, pJoueur.pseudo), {
+        pseudo: pJoueur.pseudo,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: Math.round(pos.coords.accuracy),
+        updatedAt: new Date().toISOString(),
+        startTime: pStartTime,
+        bonus: pBonus
+      });
+    }
     updateNavUI();
-  },function(err){console.warn("GPS:",err.message);},{enableHighAccuracy:true,timeout:10000});
+  }, function(err){
+    console.warn("GPS:", err.message);
+  }, {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 1000  /* Accepter une position vieille de max 1s */
+  });
 }
+function stopGPS(){
+  if(pGpsInterval !== null){
+    navigator.geolocation.clearWatch(pGpsInterval);
+    pGpsInterval = null;
+  }
+}
+function sendGPS(){} /* Gardé pour compatibilité */
 async function saveTraceAndCleanGPS(){
   if(!pJoueur||!window._pUid)return;
   if(pGpsTrace.length>0)await fbSet(rTrace(window._pUid,window._pCid,pJoueur.pseudo),{pseudo:pJoueur.pseudo,points:pGpsTrace,date:new Date().toLocaleString("fr-FR"),savedAt:new Date().toISOString()});
