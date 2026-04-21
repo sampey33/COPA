@@ -890,6 +890,10 @@ window.signOut = async function(){
 };
 
 onAuthStateChanged(AUTH, async function(user){
+  /* Ne pas connecter automatiquement si on est en mode reset mot de passe */
+  var params = new URLSearchParams(location.search);
+  if(params.get("mode") === "resetPassword") return;
+
   if(user){
     currentUser = user;
     document.getElementById("auth-screen").style.display="none";
