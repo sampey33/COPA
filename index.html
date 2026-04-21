@@ -6,6 +6,8 @@
 <title>COPA</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("jyAMl9gWJYHZwjuRL");</script>
 <style>
 :root{--olive:#4a5240;--olive-dark:#2e3328;--khaki:#8b8b5a;--sand:#c8b882;--red:#c0392b;--green:#27ae60;--bg:#1a1c16;--bg2:#22251c;--bg3:#2a2e22;--text:#d4cdb0;--dim:#7a7560;--border:#363a2c}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -861,6 +863,11 @@ window.createAccount = async function(){
   try{
     var cred = await createUserWithEmailAndPassword(AUTH, email, pass);
     await fbSet(doc(DB,"users",cred.user.uid),{name:name, email:email, createdAt:new Date().toISOString()});
+    /* Envoyer l'email de bienvenue via EmailJS */
+    emailjs.send("service_18u2rcs", "template_f19acti", {
+      name: name,
+      email: email
+    }).catch(function(e){ console.warn("EmailJS:", e); });
   }catch(e){ document.getElementById("reg-err").textContent=e.message; }
 };
 
