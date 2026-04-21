@@ -124,6 +124,11 @@ select option{background:var(--bg3)}
 .rule-bonus-box{display:flex;gap:12px;margin-bottom:8px}
 .rule-bonus{border-radius:4px;padding:10px 16px;flex:1;text-align:center}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--olive);border-radius:3px}
+/* ── OFFLINE ── */
+#offline-banner{display:none;position:fixed;top:54px;left:0;right:0;z-index:90;background:#7f3c00;border-bottom:2px solid #e67e22;padding:7px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:#f5cba7;letter-spacing:1px}
+#offline-banner.show{display:block}
+#sync-toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--olive-dark);border:1px solid var(--khaki);border-radius:4px;padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--sand);z-index:300;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+#sync-toast.show{display:block}
 </style>
 </head>
 <body>
@@ -136,6 +141,9 @@ select option{background:var(--bg3)}
     <button class="tab"        id="tab-regles"      onclick="navMain('regles',this)">Regles</button>
   </div>
 </header>
+
+<div id="offline-banner">⚡ MODE HORS-LIGNE — Les données seront synchronisées au retour du réseau</div>
+<div id="sync-toast"></div>
 
 <!-- ===== ADMIN ===== -->
 <div id="view-admin" class="view active">
@@ -559,11 +567,213 @@ var liveGpsMap=null, liveGpsMarkers={};
 var mapRefreshInterval=null, mapTimerInterval=null;
 var COLORS=["#e74c3c","#3498db","#2ecc71","#f39c12","#9b59b6","#1abc9c","#e67e22","#e91e63","#00bcd4","#8bc34a"];
 
-/* ── FIREBASE HELPERS ── */
-async function fbSet(ref,data){try{await setDoc(ref,data);}catch(e){console.error(e);}}
-async function fbDel(ref){try{await deleteDoc(ref);}catch(e){console.error(e);}}
-async function fbAdd(col,data){try{return await addDoc(col,data);}catch(e){console.error(e);}}
-async function fbGetDocs(col){try{return await getDocs(col);}catch(e){return {forEach:function(){}}; }}
+/* ══════════════════════════════════════════════════════
+   MODE HORS-LIGNE — Gestion réseau + file d'attente sync
+   ══════════════════════════════════════════════════════ */
+
+var _isOnline = navigator.onLine;
+var _syncQueue = JSON.parse(localStorage.getItem('copa_sync_queue')||'[]');
+var _offlineCache = JSON.parse(localStorage.getItem('copa_offline_cache')||'{}');
+
+/* Afficher le bandeau immédiatement si déjà hors-ligne */
+if(!_isOnline){ document.addEventListener('DOMContentLoaded', function(){ _showOfflineBanner(); }); }
+
+function _persistQueue(){ localStorage.setItem('copa_sync_queue', JSON.stringify(_syncQueue)); }
+function _persistCache(){ localStorage.setItem('copa_offline_cache', JSON.stringify(_offlineCache)); }
+
+function _refToKey(ref){ return ref.path || (ref._key && ref._key.path.canonicalString()) || String(ref); }
+
+function _showOfflineBanner(){
+  document.getElementById('offline-banner').classList.add('show');
+}
+function _hideOfflineBanner(){
+  document.getElementById('offline-banner').classList.remove('show');
+}
+function _showToast(msg, duration){
+  var t = document.getElementById('sync-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, duration||3000);
+}
+
+window.addEventListener('online', async function(){
+  _isOnline = true;
+  _hideOfflineBanner();
+  if(_syncQueue.length > 0){
+    _showToast('⏫ Synchronisation en cours… ('+_syncQueue.length+' opération(s))');
+    await _flushQueue();
+  } else {
+    _showToast('✅ Réseau rétabli');
+  }
+});
+window.addEventListener('offline', function(){
+  _isOnline = false;
+  _showOfflineBanner();
+  _showToast('📵 Mode hors-ligne activé', 4000);
+});
+
+/* Rejouer la file d'attente dès que le réseau revient */
+async function _flushQueue(){
+  var failed = [];
+  for(var i=0;i<_syncQueue.length;i++){
+    var op = _syncQueue[i];
+    try{
+      if(op.type==='set'){
+        var r = doc(DB, ...op.path.split('/').reduce(function(acc,p,i,a){
+          if(i%2===0&&i+1<a.length)acc.push(a[i],a[i+1]);return acc;},[]).flat());
+        await setDoc(r, op.data, op.options||{});
+      } else if(op.type==='add'){
+        var segments = op.colPath.split('/');
+        var c = collection(DB, segments[0], ...segments.slice(1));
+        await addDoc(c, op.data);
+      } else if(op.type==='del'){
+        var rd = doc(DB, ...op.path.split('/').reduce(function(acc,p,i,a){
+          if(i%2===0&&i+1<a.length)acc.push(a[i],a[i+1]);return acc;},[]).flat());
+        await deleteDoc(rd);
+      }
+    } catch(e){
+      console.warn('Sync failed for op', op, e);
+      failed.push(op);
+    }
+  }
+  _syncQueue = failed;
+  _persistQueue();
+  if(failed.length===0){
+    _showToast('✅ Synchronisation terminée');
+  } else {
+    _showToast('⚠️ '+failed.length+' opération(s) non synchronisée(s)');
+  }
+}
+
+/* Extraire le chemin d'une ref Firestore */
+function _getRefPath(ref){
+  try{ return ref.path; } catch(e){ return null; }
+}
+function _getColPath(col){
+  try{ return col.path; } catch(e){ return null; }
+}
+
+/* ── FIREBASE HELPERS (offline-aware) ── */
+async function fbSet(ref, data, options){
+  var key = _getRefPath(ref);
+  /* Mettre à jour le cache local immédiatement */
+  if(key){ _offlineCache[key] = JSON.parse(JSON.stringify(data)); _persistCache(); }
+  if(!_isOnline){
+    /* Ajouter en file d'attente */
+    _syncQueue.push({type:'set', path:key, data:JSON.parse(JSON.stringify(data)), options:options||null});
+    _persistQueue();
+    return;
+  }
+  try{
+    await setDoc(ref, data, options||{});
+  } catch(e){
+    console.error('fbSet error:', e);
+    _syncQueue.push({type:'set', path:key, data:JSON.parse(JSON.stringify(data)), options:options||null});
+    _persistQueue();
+    _isOnline = false; _showOfflineBanner();
+  }
+}
+
+async function fbDel(ref){
+  var key = _getRefPath(ref);
+  if(key){ delete _offlineCache[key]; _persistCache(); }
+  if(!_isOnline){
+    _syncQueue.push({type:'del', path:key});
+    _persistQueue();
+    return;
+  }
+  try{
+    await deleteDoc(ref);
+  } catch(e){
+    console.error('fbDel error:', e);
+    _syncQueue.push({type:'del', path:key});
+    _persistQueue();
+    _isOnline = false; _showOfflineBanner();
+  }
+}
+
+async function fbAdd(col, data){
+  var colPath = _getColPath(col);
+  if(!_isOnline){
+    _syncQueue.push({type:'add', colPath:colPath, data:JSON.parse(JSON.stringify(data))});
+    _persistQueue();
+    return null;
+  }
+  try{
+    return await addDoc(col, data);
+  } catch(e){
+    console.error('fbAdd error:', e);
+    _syncQueue.push({type:'add', colPath:colPath, data:JSON.parse(JSON.stringify(data))});
+    _persistQueue();
+    _isOnline = false; _showOfflineBanner();
+    return null;
+  }
+}
+
+async function fbGetDocs(col){
+  if(!_isOnline){
+    /* Chercher dans le cache local toutes les entrées qui correspondent à ce chemin */
+    var colPath = _getColPath(col);
+    var results = [];
+    if(colPath){
+      Object.keys(_offlineCache).forEach(function(k){
+        if(k.startsWith(colPath+'/')){
+          var id = k.split('/').pop();
+          results.push({id:id, data:function(){ return _offlineCache[k]; }});
+        }
+      });
+    }
+    return { forEach: function(fn){ results.forEach(fn); } };
+  }
+  try{
+    var snap = await getDocs(col);
+    /* Mettre à jour le cache avec les données fraîches */
+    var colPath2 = _getColPath(col);
+    if(colPath2){
+      snap.forEach(function(d){
+        _offlineCache[colPath2+'/'+d.id] = d.data();
+      });
+      _persistCache();
+    }
+    return snap;
+  } catch(e){
+    console.error('fbGetDocs error (using cache):', e);
+    _isOnline = false; _showOfflineBanner();
+    /* Fallback sur le cache */
+    var colPath3 = _getColPath(col);
+    var cached = [];
+    if(colPath3){
+      Object.keys(_offlineCache).forEach(function(k){
+        if(k.startsWith(colPath3+'/')){
+          var id = k.split('/').pop();
+          cached.push({id:id, data:function(){ return _offlineCache[k]; }});
+        }
+      });
+    }
+    return { forEach: function(fn){ cached.forEach(fn); } };
+  }
+}
+
+/* Sauvegarder l'état participant en local pour reprise après fermeture */
+function _saveParticipantState(){
+  if(!pJoueur) return;
+  var state = {
+    joueur: pJoueur, postes_data: postes, pPostes: pPostes, pBonus: pBonus,
+    pStartTime: pStartTime, pGpsTrace: pGpsTrace,
+    pUid: window._pUid, pCid: window._pCid, pCfg: window._pCfg,
+    savedAt: Date.now()
+  };
+  localStorage.setItem('copa_participant_state', JSON.stringify(state));
+}
+
+function _clearParticipantState(){
+  localStorage.removeItem('copa_participant_state');
+}
+
+/* Appel périodique de sauvegarde de l'état participant */
+setInterval(function(){
+  if(pJoueur && pStartTime) _saveParticipantState();
+}, 15000); /* toutes les 15s */
 
 /* ── AUTH ── */
 window.showRegister = function(){ document.getElementById("auth-login").style.display="none"; document.getElementById("auth-register").style.display="block"; };
@@ -1298,6 +1508,61 @@ function getNext(j,validated){
 }
 
 /* ── PARTICIPANT LOGIN ── */
+/* Vérifier s'il existe une session interrompue à reprendre */
+(function checkSavedSession(){
+  var raw = localStorage.getItem('copa_participant_state');
+  if(!raw) return;
+  try{
+    var state = JSON.parse(raw);
+    /* Session de moins de 12h */
+    if(Date.now() - state.savedAt > 12*3600*1000){ localStorage.removeItem('copa_participant_state'); return; }
+    /* Afficher une bannière de reprise */
+    var loginBox = document.querySelector('#s-login .center-box');
+    if(!loginBox) return;
+    var resumeEl = document.createElement('div');
+    resumeEl.style.cssText = 'background:rgba(200,184,130,.1);border:1px solid var(--khaki);border-radius:4px;padding:14px;margin-bottom:14px;text-align:center';
+    resumeEl.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:.78rem;color:var(--sand);margin-bottom:8px">SESSION INTERROMPUE DETECTEE</div>'
+      + '<div style="font-size:.82rem;color:var(--dim);margin-bottom:10px">Participant : <strong style="color:var(--text)">'+(state.joueur&&state.joueur.pseudo||'?')+'</strong></div>'
+      + '<button class="btn btn-primary btn-sm" onclick="resumeSession()">Reprendre la course</button>'
+      + ' <button class="btn btn-ghost btn-sm" onclick="discardSession()">Ignorer</button>';
+    loginBox.insertBefore(resumeEl, loginBox.firstChild);
+  }catch(e){ localStorage.removeItem('copa_participant_state'); }
+})();
+
+window.resumeSession = function(){
+  var raw = localStorage.getItem('copa_participant_state');
+  if(!raw) return;
+  try{
+    var state = JSON.parse(raw);
+    postes = state.postes_data || [];
+    pJoueur = state.joueur;
+    pPostes = state.pPostes || {};
+    pBonus  = state.pBonus  || 0;
+    pStartTime = state.pStartTime || Date.now();
+    pGpsTrace  = state.pGpsTrace  || [];
+    pElapsed = null; pSelOpt = null; pCurrentPoste = null; pQuestions = []; pQIdx = 0;
+    lastUserLat = null; lastUserLng = null;
+    window._pUid = state.pUid;
+    window._pCid = state.pCid;
+    window._pCfg = state.pCfg || {};
+    var cfg = window._pCfg;
+    document.getElementById("ph-name").textContent = cfg.name||"COPA";
+    document.getElementById("ph-unit").textContent = cfg.unit||"";
+    document.getElementById("s-login").style.display = "none";
+    document.getElementById("s-scan").style.display  = "block";
+    document.getElementById("scan-name-disp").textContent = pJoueur.pseudo;
+    startTimer(); startGPS(); startDeviceOrientation(); updateProgress();
+    _showToast('✅ Session reprise !');
+  }catch(e){
+    localStorage.removeItem('copa_participant_state');
+    alert('Erreur lors de la reprise : '+e.message);
+  }
+};
+window.discardSession = function(){
+  localStorage.removeItem('copa_participant_state');
+  var el = document.querySelector('#s-login .center-box > div:first-child');
+  if(el && el.innerHTML.includes('SESSION')) el.remove();
+};
 window.doLogin=async function(){
   var courseCode=(document.getElementById("p-course-code").value||"").trim().toUpperCase();
   var pseudo=(document.getElementById("p-name-inp").value||"").trim().toUpperCase();
@@ -1531,6 +1796,7 @@ window.submitAnswer=function(){
     var validated=buildProgressSnap();
     var detail={};Object.keys(pPostes).forEach(function(num){detail[num]=pPostes[num].questions||[];});
     fbSet(rProg(window._pUid,window._pCid,pJoueur.pseudo),{pseudo:pJoueur.pseudo,validated:validated,detail:detail,bonus:pBonus,elapsed:null,startTime:pStartTime,updatedAt:new Date().toISOString(),stopped:false});
+    _saveParticipantState(); /* ← Sauvegarder après chaque poste validé */
     var allDone=postes.every(function(p){return pPostes.hasOwnProperty(p.num)&&pPostes[p.num].done;});
     if(allDone){pElapsed=Math.max(0,Math.floor((Date.now()-pStartTime)/1000)-pBonus);clearInterval(pTimerInterval);clearInterval(pVisualInterval);document.getElementById("q-next").innerHTML='<button class="btn btn-primary" onclick="doFinish()">TERMINER - VOIR MON RESULTAT</button>';}
     else{document.getElementById("q-next").innerHTML='<button class="btn btn-ghost" onclick="backToScan()">Poste suivant</button>';}
@@ -1547,6 +1813,7 @@ function buildProgressSnap(){
 /* ── FINISH ── */
 window.doFinish=async function(){
   clearInterval(pTimerInterval);clearInterval(pVisualInterval);stopGPS();
+  _clearParticipantState(); /* ← Effacer la session sauvegardée */
   await saveTraceAndCleanGPS();
   var rawElapsed=Math.floor((Date.now()-pStartTime)/1000);var adjusted=Math.max(0,rawElapsed-pBonus);
   if(pElapsed===null)pElapsed=adjusted;
@@ -1578,6 +1845,7 @@ window.restart=function(){
   pCurrentPoste=null;pSelOpt=null;pQuestions=[];pQIdx=0;pGpsTrace=[];
   lastUserLat=null;lastUserLng=null;deviceHeading=null;
   clearInterval(pTimerInterval);clearInterval(pVisualInterval);stopGPS();
+  _clearParticipantState(); /* ← Effacer la session */
   ["s-login","s-scan","s-qcm","s-result"].forEach(function(id){document.getElementById(id).style.display="none";});
   document.getElementById("s-login").style.display="block";
   document.getElementById("p-name-inp").value="";document.getElementById("p-course-code").value="";
