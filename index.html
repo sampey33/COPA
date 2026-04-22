@@ -817,6 +817,10 @@ async function fbSet(ref, data, options){
     await setDoc(ref, data, options||{});
   } catch(e){
     console.error('fbSet error:', e);
+    /* Ne pas passer en mode hors ligne si c'est une erreur de permission */
+    if(e.code==='permission-denied'||e.code==='PERMISSION_DENIED'){
+      throw e; /* Remonter l'erreur pour qu'elle s'affiche correctement */
+    }
     _syncQueue.push({type:'set', path:key, data:JSON.parse(JSON.stringify(data)), options:options||null});
     _persistQueue();
     _isOnline = false; _showOfflineBanner();
@@ -887,6 +891,10 @@ async function fbGetDocs(col){
     return snap;
   } catch(e){
     console.error('fbGetDocs error (using cache):', e);
+    /* Ne pas passer en mode hors ligne si c'est une erreur de permission */
+    if(e.code==='permission-denied'||e.code==='PERMISSION_DENIED'){
+      throw e;
+    }
     _isOnline = false; _showOfflineBanner();
     /* Fallback sur le cache */
     var colPath3 = _getColPath(col);
@@ -999,11 +1007,19 @@ onAuthStateChanged(AUTH, async function(user){
     document.getElementById("r-tab-custom-btn").style.display="inline-block";
     document.getElementById("r-tab-notice-btn").style.display="inline-block";
     buildQuestionsUI(3,null);
+    /* Petit délai pour s'assurer que Firebase est prêt (Android WebView) */
+    await new Promise(function(r){setTimeout(r,500);});
     /* Charger la derniere course active */
-    var userDoc = await getDoc(doc(DB,"users",user.uid));
-    if(userDoc.exists()&&userDoc.data().lastCourseId){
-      await selectCourse(userDoc.data().lastCourseId);
-    } else {
+    try{
+      var userDoc = await getDoc(doc(DB,"users",user.uid));
+      if(userDoc.exists()&&userDoc.data().lastCourseId){
+        await selectCourse(userDoc.data().lastCourseId);
+      } else {
+        document.getElementById("no-course-msg").style.display="block";
+        document.getElementById("admin-panels").style.display="none";
+      }
+    } catch(e){
+      console.error("Erreur chargement cours:", e);
       document.getElementById("no-course-msg").style.display="block";
       document.getElementById("admin-panels").style.display="none";
     }
