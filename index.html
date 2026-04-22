@@ -10,6 +10,50 @@
 <script>emailjs.init("jyAMl9gWJYHZwjuRL");</script>
 <style>
 :root{--olive:#4a5240;--olive-dark:#2e3328;--khaki:#8b8b5a;--sand:#c8b882;--red:#c0392b;--green:#27ae60;--bg:#1a1c16;--bg2:#22251c;--bg3:#2a2e22;--text:#d4cdb0;--dim:#7a7560;--border:#363a2c}
+
+/* ══ THEMES ══ */
+/* MILITAIRE = défaut (variables :root) */
+
+/* ENTREPRISE */
+body.theme-entreprise{
+  --olive:#1a3a5c;--olive-dark:#0f2440;--khaki:#2d7dd2;--sand:#5ba3f5;
+  --red:#e53e3e;--green:#38a169;--bg:#f7f9fc;--bg2:#ffffff;--bg3:#edf2f7;
+  --text:#1a202c;--dim:#718096;--border:#e2e8f0;
+}
+body.theme-entreprise header{background:#0f2440;border-bottom:2px solid #2d7dd2;}
+body.theme-entreprise header::after{background:linear-gradient(to right,#2d7dd2 33%,white 33%,white 66%,#5ba3f5 66%);}
+body.theme-entreprise .card{border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+body.theme-entreprise .btn{border-radius:6px;}
+body.theme-entreprise input,body.theme-entreprise textarea,body.theme-entreprise select{border-radius:6px;background:#fff;color:#1a202c;border-color:#cbd5e0;}
+body.theme-entreprise .auth-box{background:#fff;border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+body.theme-entreprise .big-timer{background:#0f2440;color:#5ba3f5;border-color:#2d7dd2;}
+body.theme-entreprise .compass-wrap{background:#fff;border-color:#e2e8f0;}
+body.theme-entreprise .prog-inner{background:#2d7dd2;}
+body.theme-entreprise .opt-choice{background:#fff;border-color:#e2e8f0;}
+body.theme-entreprise .qcm-header{background:#0f2440;border-color:#2d7dd2;}
+body.theme-entreprise .qcm-body{border-color:#2d7dd2;}
+
+/* ENFANT */
+body.theme-enfant{
+  --olive:#7c3aed;--olive-dark:#5b21b6;--khaki:#f59e0b;--sand:#fbbf24;
+  --red:#ef4444;--green:#10b981;--bg:#faf5ff;--bg2:#ffffff;--bg3:#f3e8ff;
+  --text:#1f1535;--dim:#7c3aed;--border:#ddd6fe;
+}
+body.theme-enfant{font-size:1.05rem;}
+body.theme-enfant header{background:#5b21b6;border-bottom:3px solid #f59e0b;}
+body.theme-enfant header::after{background:linear-gradient(to right,#7c3aed 33%,#f59e0b 33%,#f59e0b 66%,#10b981 66%);}
+body.theme-enfant .card{border-radius:16px;border:2px solid var(--border);}
+body.theme-enfant .btn{border-radius:25px;font-size:.9rem;padding:10px 20px;}
+body.theme-enfant input,body.theme-enfant textarea,body.theme-enfant select{border-radius:12px;font-size:1rem;padding:10px 14px;background:#fff;color:#1f1535;}
+body.theme-enfant .auth-box{border-radius:20px;background:#fff;border:3px solid #f59e0b;}
+body.theme-enfant .big-timer{border-radius:16px;font-size:2.8rem;background:#5b21b6;color:#fbbf24;border:3px solid #7c3aed;}
+body.theme-enfant .compass-wrap{border-radius:20px;background:#fff;border:2px solid #ddd6fe;}
+body.theme-enfant .opt-choice{border-radius:12px;background:#fff;border:2px solid #ddd6fe;font-size:1rem;}
+body.theme-enfant .qcm-header{border-radius:12px 12px 0 0;background:#5b21b6;border-color:#7c3aed;}
+body.theme-enfant .qcm-body{border-radius:0 0 12px 12px;border-color:#7c3aed;}
+body.theme-enfant .prog-inner{background:linear-gradient(to right,#7c3aed,#f59e0b);}
+body.theme-enfant .row-item{border-radius:10px;border:2px solid var(--border);}
+body.theme-enfant label{font-size:1rem;}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
@@ -316,6 +360,12 @@ select option{background:var(--bg3)}
           <label>Duree du chrono (minutes)</label><input type="number" id="cfg-duration" min="1" max="480">
           <label>Nombre de balises</label>
           <input type="number" id="cfg-nbpostes" min="2" max="30">
+          <label>Thème de l'interface participant</label>
+          <select id="cfg-theme">
+            <option value="militaire">🎖️ Militaire (défaut)</option>
+            <option value="entreprise">💼 Entreprise</option>
+            <option value="enfant">🎨 Enfant</option>
+          </select>
           <label>URL du site (pour les QR codes)</label>
           <input id="cfg-siteurl" placeholder="https://sampey33.github.io/COPA/">
           <button class="btn btn-primary mt-12" onclick="saveConfig()">Enregistrer</button>
@@ -381,9 +431,9 @@ select option{background:var(--bg3)}
       </div>
       <div id="login-form">
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:20px;text-align:center;margin-bottom:16px">
-          <div style="font-size:2rem;margin-bottom:8px">📱</div>
-          <div style="font-weight:600;margin-bottom:4px">Scannez votre QR code</div>
-          <div style="color:var(--dim);font-size:.82rem">ou saisissez votre code de course et pseudo</div>
+          <div id="scan-emoji" style="font-size:2rem;margin-bottom:8px">📱</div>
+          <div id="scan-title" style="font-weight:600;margin-bottom:4px">Scannez votre QR code</div>
+          <div id="scan-sub" style="color:var(--dim);font-size:.82rem">ou saisissez votre code de course et pseudo</div>
         </div>
         <label>Code de la course</label>
         <input id="p-course-code" placeholder="Ex : COPA42" style="text-transform:uppercase;text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')document.getElementById('p-name-inp').focus()">
@@ -461,7 +511,7 @@ select option{background:var(--bg3)}
         <div class="q-text" id="q-text"></div>
         <div id="q-opts"></div>
         <div id="q-feedback" style="display:none"></div>
-        <div class="mt-16" id="q-submit"><button class="btn btn-primary" onclick="submitAnswer()">VALIDER</button></div>
+        <div class="mt-16" id="q-submit"><button id="p-validate-btn" class="btn btn-primary" onclick="submitAnswer()">VALIDER</button></div>
         <div class="mt-12" id="q-next" style="display:none"></div>
       </div>
     </div>
@@ -490,7 +540,7 @@ select option{background:var(--bg3)}
     <div id="r-view-standard">
       <div style="line-height:1.8;font-size:.9rem">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin:0 0 8px">Objectif</div>
-        <p>Chaque participant doit trouver et valider toutes les balises disseminees sur le terrain dans un temps imparti. A chaque balise, il repond a des questions tactiques ou techniques. Son temps final est ajuste en fonction de ses reponses.</p>
+        <p>Chaque participant doit trouver et valider toutes les balises disseminees sur le terrain dans un temps imparti. A chaque balise, il repond a des questions diverses choisies par l'organisateur. Son temps final est ajuste en fonction de ses reponses.</p>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin:16px 0 8px">Deroulement</div>
         <p>Avant le depart, l'encadrant remet a chaque participant son QR code personnel. Le participant scanne ce QR code pour rejoindre la course automatiquement.</p>
         <p style="margin-top:8px">Chaque participant suit un ordre de passage different. La derniere balise est le point final commun a tous.</p>
@@ -1105,6 +1155,7 @@ window.saveConfig=async function(){
   var d=parseInt(document.getElementById("cfg-duration").value); if(d)cfg.duration=d;
   var nb=parseInt(document.getElementById("cfg-nbpostes").value); if(nb&&nb>=2)cfg.nbPostes=nb;
   var s=document.getElementById("cfg-siteurl").value.trim(); if(s)cfg.siteUrl=s;
+  var th=document.getElementById("cfg-theme").value; cfg.theme=th||"militaire";
   currentCourse.cfg=cfg;
   await fbSet(rCourse(currentUser.uid,currentCourse.id),currentCourse);
   buildRotationSelect(); updateFormMax();
@@ -1127,6 +1178,7 @@ function syncCfg(){
   document.getElementById("cfg-duration").value=cfg.duration||120;
   document.getElementById("cfg-nbpostes").value=cfg.nbPostes||10;
   document.getElementById("cfg-siteurl").value=cfg.siteUrl||"https://sampey33.github.io/COPA/";
+  document.getElementById("cfg-theme").value=cfg.theme||"militaire";
   document.getElementById("custom-rules-input").value=currentCourse.customRules||"";
 }
 function updateFormMax(){
@@ -1721,6 +1773,8 @@ window.doLogin=async function(){
     document.getElementById("ph-unit").textContent=cfg.unit||"";
     document.getElementById("p-timer").textContent=fmtTime((cfg.duration||120)*60);
     window._pCfg=cfg;
+    /* Appliquer le thème */
+    applyTheme(cfg.theme||"militaire");
     document.getElementById("s-login").style.display="none";
     document.getElementById("s-scan").style.display="block";
     document.getElementById("scan-name-disp").textContent=j.pseudo;
@@ -1802,6 +1856,30 @@ async function saveTraceAndCleanGPS(){
   if(!pJoueur||!window._pUid)return;
   if(pGpsTrace.length>0)await fbSet(rTrace(window._pUid,window._pCid,pJoueur.pseudo),{pseudo:pJoueur.pseudo,points:pGpsTrace,date:new Date().toLocaleString("fr-FR"),savedAt:new Date().toISOString()});
   try{await fbDel(rGps(window._pUid,window._pCid,pJoueur.pseudo));}catch(e){}
+}
+
+/* ── THEME ── */
+function applyTheme(theme){
+  document.body.classList.remove("theme-entreprise","theme-enfant");
+  if(theme==="entreprise") document.body.classList.add("theme-entreprise");
+  if(theme==="enfant")     document.body.classList.add("theme-enfant");
+  /* Textes adaptés selon le thème */
+  var labels={
+    militaire:{balise:"BALISE",poste:"POSTE",distance:"DISTANCE",valider:"VALIDER LE CODE",scan:"Scannez votre QR code",sub:"ou saisissez votre code de course et pseudo"},
+    entreprise:{balise:"ÉTAPE",poste:"ÉTAPE",distance:"DISTANCE",valider:"VALIDER LE CODE",scan:"Scannez votre QR code",sub:"ou saisissez votre code de parcours et prénom"},
+    enfant:{balise:"BALISE 🎯",poste:"BALISE",distance:"TU ES À",valider:"J'AI TROUVÉ ! 🎉",scan:"Scanne ton QR code ! 📱",sub:"ou demande le code à ton animateur"}
+  };
+  var l=labels[theme]||labels.militaire;
+  /* Mettre à jour les textes */
+  var els={
+    "scan-title":l.scan,
+    "scan-sub":l.sub,
+    "p-validate-btn":l.valider
+  };
+  Object.keys(els).forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.textContent=els[id];
+  });
 }
 
 /* ── BOUSSOLE ── */
