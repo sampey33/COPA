@@ -1799,17 +1799,39 @@ async function saveTraceAndCleanGPS(){
 }
 
 /* ── BOUSSOLE ── */
+var _orientationStarted=false;
 function startDeviceOrientation(){
-  if(window.DeviceOrientationEvent){window.addEventListener("deviceorientationabsolute",onOrientation,true);window.addEventListener("deviceorientation",onOrientation,true);}
+  if(_orientationStarted)return;
+  _orientationStarted=true;
+  /* Demander la permission sur iOS 13+ */
+  if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
+    DeviceOrientationEvent.requestPermission().then(function(state){
+      if(state==="granted"){
+        window.addEventListener("deviceorientationabsolute",onOrientation,true);
+        window.addEventListener("deviceorientation",onOrientation,true);
+      }
+    }).catch(function(){
+      window.addEventListener("deviceorientation",onOrientation,true);
+    });
+  } else if(window.DeviceOrientationEvent){
+    /* Android / autres : pas de permission requise */
+    window.addEventListener("deviceorientationabsolute",onOrientation,true);
+    window.addEventListener("deviceorientation",onOrientation,true);
+  }
 }
 function onOrientation(e){
-  if(e.absolute&&e.alpha!==null){
-    /* Android : alpha = rotation de l'ecran, on la convertit en cap magnetique */
-    deviceHeading = (360 - e.alpha) % 360;
-  } else if(e.webkitCompassHeading!==undefined&&e.webkitCompassHeading!==null){
-    /* iOS : webkitCompassHeading donne directement le cap magnetique */
-    deviceHeading = e.webkitCompassHeading;
+  var h=null;
+  if(e.webkitCompassHeading!==undefined&&e.webkitCompassHeading!==null&&e.webkitCompassHeading>=0){
+    /* iOS */
+    h=e.webkitCompassHeading;
+  } else if(e.absolute===true&&e.alpha!==null){
+    /* Android absolute */
+    h=(360-e.alpha+360)%360;
+  } else if(e.alpha!==null){
+    /* Android non-absolute fallback */
+    h=(360-e.alpha+360)%360;
   }
+  if(h!==null){deviceHeading=h;}
   if(lastUserLat!==null)updateArrow();
 }
 function updateNavUI(){
@@ -1857,6 +1879,12 @@ window.switchPTab=function(tab){
   document.getElementById("p-view-code").style.display=tab==="code"?"block":"none";
   document.getElementById("p-tab-nav-btn").className="btn btn-sm "+(tab==="nav"?"btn-primary":"btn-ghost");
   document.getElementById("p-tab-code-btn").className="btn btn-sm "+(tab==="code"?"btn-primary":"btn-ghost");
+  if(tab==="nav"){
+    /* Relancer la boussole si elle n'est pas active */
+    _orientationStarted=false;
+    startDeviceOrientation();
+    updateArrow();
+  }
 };
 
 /* ── SAISIE CODE ── */
