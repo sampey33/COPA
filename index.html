@@ -16,44 +16,50 @@
 
 /* ENTREPRISE */
 body.theme-entreprise{
-  --olive:#1a3a5c;--olive-dark:#0f2440;--khaki:#2d7dd2;--sand:#5ba3f5;
-  --red:#e53e3e;--green:#38a169;--bg:#f7f9fc;--bg2:#ffffff;--bg3:#edf2f7;
-  --text:#1a202c;--dim:#718096;--border:#e2e8f0;
+  --olive:#5a7d9a;--olive-dark:#3d5a73;--khaki:#7aadcc;--sand:#a0c8e0;
+  --red:#c97a7a;--green:#7ab89a;--bg:#f5f8fa;--bg2:#ffffff;--bg3:#eaf1f5;
+  --text:#1e2d3a;--dim:#7a9ab0;--border:#c8dce8;
 }
-body.theme-entreprise header{background:#0f2440;border-bottom:2px solid #2d7dd2;}
-body.theme-entreprise header::after{background:linear-gradient(to right,#2d7dd2 33%,white 33%,white 66%,#5ba3f5 66%);}
-body.theme-entreprise .card{border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+body.theme-entreprise header{background:#3d5a73;border-bottom:2px solid #7aadcc;}
+body.theme-entreprise header::after{background:linear-gradient(to right,#5a7d9a 33%,#c8dce8 33%,#c8dce8 66%,#7aadcc 66%);}
+body.theme-entreprise .card{border-radius:8px;box-shadow:0 1px 4px rgba(90,125,154,.1);border:1px solid #c8dce8;}
 body.theme-entreprise .btn{border-radius:6px;}
-body.theme-entreprise input,body.theme-entreprise textarea,body.theme-entreprise select{border-radius:6px;background:#fff;color:#1a202c;border-color:#cbd5e0;}
-body.theme-entreprise .auth-box{background:#fff;border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,.08);}
-body.theme-entreprise .big-timer{background:#0f2440;color:#5ba3f5;border-color:#2d7dd2;}
-body.theme-entreprise .compass-wrap{background:#fff;border-color:#e2e8f0;}
-body.theme-entreprise .prog-inner{background:#2d7dd2;}
-body.theme-entreprise .opt-choice{background:#fff;border-color:#e2e8f0;}
-body.theme-entreprise .qcm-header{background:#0f2440;border-color:#2d7dd2;}
-body.theme-entreprise .qcm-body{border-color:#2d7dd2;}
+body.theme-entreprise .btn-primary{background:#5a7d9a;color:#fff;}
+body.theme-entreprise .btn-primary:hover{background:#3d5a73;}
+body.theme-entreprise input,body.theme-entreprise textarea,body.theme-entreprise select{border-radius:6px;background:#fff;color:#1e2d3a;border-color:#c8dce8;}
+body.theme-entreprise .auth-box{background:#fff;border:1px solid #c8dce8;box-shadow:0 4px 20px rgba(90,125,154,.1);}
+body.theme-entreprise .big-timer{background:#3d5a73;color:#a0c8e0;border-color:#5a7d9a;}
+body.theme-entreprise .compass-wrap{background:#fff;border-color:#c8dce8;}
+body.theme-entreprise .prog-inner{background:linear-gradient(to right,#5a7d9a,#7aadcc);}
+body.theme-entreprise .opt-choice{background:#fff;border-color:#c8dce8;}
+body.theme-entreprise .qcm-header{background:#3d5a73;border-color:#5a7d9a;}
+body.theme-entreprise .qcm-body{border-color:#5a7d9a;}
+body.theme-entreprise .card-title{color:#3d5a73;}
 
 /* ENFANT */
 body.theme-enfant{
-  --olive:#7c3aed;--olive-dark:#5b21b6;--khaki:#f59e0b;--sand:#fbbf24;
-  --red:#ef4444;--green:#10b981;--bg:#faf5ff;--bg2:#ffffff;--bg3:#f3e8ff;
-  --text:#1f1535;--dim:#7c3aed;--border:#ddd6fe;
+  --olive:#4a9b8e;--olive-dark:#2d7a6e;--khaki:#5ba8c4;--sand:#7ec8e3;
+  --red:#e07070;--green:#6abf8e;--bg:#f0faf8;--bg2:#ffffff;--bg3:#e6f4f1;
+  --text:#1a3a35;--dim:#5a8f88;--border:#b2ddd6;
 }
 body.theme-enfant{font-size:1.05rem;}
-body.theme-enfant header{background:#5b21b6;border-bottom:3px solid #f59e0b;}
-body.theme-enfant header::after{background:linear-gradient(to right,#7c3aed 33%,#f59e0b 33%,#f59e0b 66%,#10b981 66%);}
-body.theme-enfant .card{border-radius:16px;border:2px solid var(--border);}
+body.theme-enfant header{background:#2d7a6e;border-bottom:3px solid #7ec8e3;}
+body.theme-enfant header::after{background:linear-gradient(to right,#4a9b8e 33%,#a8dfd8 33%,#a8dfd8 66%,#7ec8e3 66%);}
+body.theme-enfant .card{border-radius:16px;border:2px solid #b2ddd6;box-shadow:0 2px 8px rgba(74,155,142,.1);}
 body.theme-enfant .btn{border-radius:25px;font-size:.9rem;padding:10px 20px;}
-body.theme-enfant input,body.theme-enfant textarea,body.theme-enfant select{border-radius:12px;font-size:1rem;padding:10px 14px;background:#fff;color:#1f1535;}
-body.theme-enfant .auth-box{border-radius:20px;background:#fff;border:3px solid #f59e0b;}
-body.theme-enfant .big-timer{border-radius:16px;font-size:2.8rem;background:#5b21b6;color:#fbbf24;border:3px solid #7c3aed;}
-body.theme-enfant .compass-wrap{border-radius:20px;background:#fff;border:2px solid #ddd6fe;}
-body.theme-enfant .opt-choice{border-radius:12px;background:#fff;border:2px solid #ddd6fe;font-size:1rem;}
-body.theme-enfant .qcm-header{border-radius:12px 12px 0 0;background:#5b21b6;border-color:#7c3aed;}
-body.theme-enfant .qcm-body{border-radius:0 0 12px 12px;border-color:#7c3aed;}
-body.theme-enfant .prog-inner{background:linear-gradient(to right,#7c3aed,#f59e0b);}
-body.theme-enfant .row-item{border-radius:10px;border:2px solid var(--border);}
+body.theme-enfant .btn-primary{background:#4a9b8e;color:#fff;}
+body.theme-enfant .btn-primary:hover{background:#2d7a6e;}
+body.theme-enfant input,body.theme-enfant textarea,body.theme-enfant select{border-radius:12px;font-size:1rem;padding:10px 14px;background:#fff;color:#1a3a35;border-color:#b2ddd6;}
+body.theme-enfant .auth-box{border-radius:20px;background:#fff;border:3px solid #7ec8e3;}
+body.theme-enfant .big-timer{border-radius:16px;font-size:2.8rem;background:#2d7a6e;color:#a8dfd8;border:3px solid #4a9b8e;}
+body.theme-enfant .compass-wrap{border-radius:20px;background:#fff;border:2px solid #b2ddd6;}
+body.theme-enfant .opt-choice{border-radius:12px;background:#fff;border:2px solid #b2ddd6;font-size:1rem;}
+body.theme-enfant .qcm-header{border-radius:12px 12px 0 0;background:#2d7a6e;border-color:#4a9b8e;}
+body.theme-enfant .qcm-body{border-radius:0 0 12px 12px;border-color:#4a9b8e;}
+body.theme-enfant .prog-inner{background:linear-gradient(to right,#4a9b8e,#7ec8e3);}
+body.theme-enfant .row-item{border-radius:10px;border:2px solid #b2ddd6;}
 body.theme-enfant label{font-size:1rem;}
+body.theme-enfant .card-title{color:#2d7a6e;}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:var(--olive-dark);border-bottom:2px solid var(--khaki);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
@@ -361,7 +367,7 @@ select option{background:var(--bg3)}
           <label>Nombre de balises</label>
           <input type="number" id="cfg-nbpostes" min="2" max="30">
           <label>Thème de l'interface participant</label>
-          <select id="cfg-theme">
+          <select id="cfg-theme" onchange="applyTheme(this.value)">
             <option value="militaire">🎖️ Militaire (défaut)</option>
             <option value="entreprise">💼 Entreprise</option>
             <option value="enfant">🎨 Enfant</option>
@@ -538,6 +544,13 @@ select option{background:var(--bg3)}
       <button class="btn btn-ghost  btn-sm" id="r-tab-custom-btn" onclick="switchReglesTab('custom')">Message de l'organisateur</button>
     </div>
     <div id="r-view-standard">
+      <div style="background:rgba(91,168,196,.12);border:1px solid #5ba8c4;border-radius:6px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.4rem">📍</span>
+        <div>
+          <div style="font-weight:700;color:#5ba8c4;font-size:.85rem">GÉOLOCALISATION REQUISE</div>
+          <div style="font-size:.8rem;color:var(--dim);margin-top:2px">Activez la localisation sur votre téléphone avant de commencer. La boussole et les distances fonctionnent grâce au GPS.</div>
+        </div>
+      </div>
       <div style="line-height:1.8;font-size:.9rem">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--khaki);margin:0 0 8px">Objectif</div>
         <p>Chaque participant doit trouver et valider toutes les balises disseminees sur le terrain dans un temps imparti. A chaque balise, il repond a des questions diverses choisies par l'organisateur. Son temps final est ajuste en fonction de ses reponses.</p>
@@ -1877,6 +1890,15 @@ async function saveTraceAndCleanGPS(){
 /* ── THEME ── */
 function applyTheme(theme){
   document.body.classList.remove("theme-entreprise","theme-enfant");
+  var s=document.body.style;
+  /* Réinitialiser les variables au thème militaire par défaut */
+  var vars={
+    militaire:{"--bg":"#1a1c16","--bg2":"#22251c","--bg3":"#2a2e22","--text":"#d4cdb0","--dim":"#7a7560","--border":"#363a2c","--olive":"#4a5240","--olive-dark":"#2e3328","--khaki":"#8b8b5a","--sand":"#c8b882"},
+    entreprise:{"--bg":"#f5f8fa","--bg2":"#ffffff","--bg3":"#eaf1f5","--text":"#1e2d3a","--dim":"#7a9ab0","--border":"#c8dce8","--olive":"#5a7d9a","--olive-dark":"#3d5a73","--khaki":"#7aadcc","--sand":"#a0c8e0"},
+    enfant:{"--bg":"#f0faf8","--bg2":"#ffffff","--bg3":"#e6f4f1","--text":"#1a3a35","--dim":"#5a8f88","--border":"#b2ddd6","--olive":"#4a9b8e","--olive-dark":"#2d7a6e","--khaki":"#5ba8c4","--sand":"#7ec8e3"}
+  };
+  var v=vars[theme]||vars.militaire;
+  Object.keys(v).forEach(function(k){ s.setProperty(k,v[k]); });
   if(theme==="entreprise") document.body.classList.add("theme-entreprise");
   if(theme==="enfant")     document.body.classList.add("theme-enfant");
   /* Textes adaptés selon le thème */
@@ -1886,12 +1908,7 @@ function applyTheme(theme){
     enfant:{balise:"BALISE 🎯",poste:"BALISE",distance:"TU ES À",valider:"J'AI TROUVÉ ! 🎉",scan:"Scanne ton QR code ! 📱",sub:"ou demande le code à ton animateur"}
   };
   var l=labels[theme]||labels.militaire;
-  /* Mettre à jour les textes */
-  var els={
-    "scan-title":l.scan,
-    "scan-sub":l.sub,
-    "p-validate-btn":l.valider
-  };
+  var els={"scan-title":l.scan,"scan-sub":l.sub,"p-validate-btn":l.valider};
   Object.keys(els).forEach(function(id){
     var el=document.getElementById(id);
     if(el)el.textContent=els[id];
