@@ -473,10 +473,10 @@ select option{background:var(--bg3)}
               <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">E</div>
             </div>
             <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
-              <svg width="130" height="130" viewBox="0 0 80 80">
-                <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882"/>
-                <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c"/>
-                <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
+              <svg width="180" height="180" viewBox="0 0 80 80">
+                <polygon points="40,5 55,55 40,43 25,55" fill="#c8b882"/>
+                <polygon points="40,75 55,43 40,53 25,43" fill="#363a2c"/>
+                <circle cx="40" cy="40" r="6" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2.5"/>
               </svg>
             </div>
           </div>
@@ -1985,12 +1985,9 @@ function updateArrow(){
   var arrow=document.getElementById("nav-arrow-wrap");
   var rose=document.getElementById("nav-rose");
   if(deviceHeading!==null){
-    /* La rose tourne dans le sens inverse du téléphone (N reste aligné avec le vrai Nord) */
-    /* La flèche = bearing absolu (pointe vers la cible dans le repère monde) */
     if(rose)  rose.style.transform="rotate("+((-deviceHeading+360)%360)+"deg)";
     if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
   } else {
-    /* Pas de capteur : flèche = bearing, rose fixe */
     if(rose)  rose.style.transform="rotate(0deg)";
     if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
   }
