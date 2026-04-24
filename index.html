@@ -465,17 +465,71 @@ select option{background:var(--bg3)}
         <div class="compass-wrap">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Prochain poste</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900;color:var(--sand);margin-bottom:18px" id="nav-name">-</div>
-          <div style="position:relative;width:260px;height:260px;margin:0 auto 18px">
-            <div style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--border);background:var(--bg3)"></div>
-            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">N</div>
-            <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">S</div>
-            <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">O</div>
-            <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">E</div>
-            <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
-              <svg width="130" height="130" viewBox="0 0 80 80">
-                <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882"/>
-                <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c"/>
-                <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
+          <div style="position:relative;width:270px;height:270px;margin:0 auto 18px" id="compass-container">
+
+            <!-- BOUSSOLE DEFAUT (enfant/coloré) -->
+            <div id="compass-default" style="position:absolute;inset:0">
+              <div style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--border);background:var(--bg3)"></div>
+              <div id="nav-rose" style="position:absolute;inset:0;transition:transform .3s ease">
+                <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--khaki);font-weight:700">N</div>
+                <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">S</div>
+                <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">O</div>
+                <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">E</div>
+              </div>
+              <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
+                <svg width="130" height="130" viewBox="0 0 80 80">
+                  <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882"/>
+                  <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c"/>
+                  <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- BOUSSOLE SILVA (thème militaire) -->
+            <div id="compass-silva" style="position:absolute;inset:0;display:none">
+              <svg id="silva-svg" viewBox="0 0 270 270" width="270" height="270">
+                <!-- Fond noir -->
+                <circle cx="135" cy="135" r="130" fill="#111" stroke="#333" stroke-width="3"/>
+                <!-- Anneau externe graduations -->
+                <circle cx="135" cy="135" r="120" fill="none" stroke="#555" stroke-width="1"/>
+                <!-- Graduations tous les 10° -->
+                <g id="silva-ticks" stroke="#888" stroke-width="1"></g>
+                <!-- Graduations majeures tous les 30° -->
+                <g id="silva-ticks-major" stroke="#ccc" stroke-width="2"></g>
+                <!-- Rose qui tourne -->
+                <g id="silva-rose" style="transform-origin:135px 135px;transform:rotate(0deg);transition:transform .3s ease">
+                  <!-- N rouge -->
+                  <text x="135" y="28" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="#e53e3e">N</text>
+                  <!-- S blanc -->
+                  <text x="135" y="252" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">S</text>
+                  <!-- E blanc -->
+                  <text x="252" y="140" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">E</text>
+                  <!-- W blanc -->
+                  <text x="18" y="140" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">W</text>
+                  <!-- NE NW SE SW -->
+                  <text x="222" y="58" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">NE</text>
+                  <text x="48" y="58" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">NW</text>
+                  <text x="222" y="222" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">SE</text>
+                  <text x="48" y="222" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">SW</text>
+                  <!-- Ligne Nord rouge -->
+                  <line x1="135" y1="42" x2="135" y2="70" stroke="#e53e3e" stroke-width="2.5"/>
+                  <!-- Ligne Sud -->
+                  <line x1="135" y1="200" x2="135" y2="228" stroke="#555" stroke-width="1.5"/>
+                  <line x1="42" y1="135" x2="70" y2="135" stroke="#555" stroke-width="1.5"/>
+                  <line x1="200" y1="135" x2="228" y2="135" stroke="#555" stroke-width="1.5"/>
+                </g>
+                <!-- Aiguille qui tourne vers la cible -->
+                <g id="silva-arrow" style="transform-origin:135px 135px;transform:rotate(0deg);transition:transform .5s ease">
+                  <!-- Moitié Nord rouge -->
+                  <polygon points="135,52 142,135 135,125 128,135" fill="#e53e3e"/>
+                  <!-- Moitié Sud noire -->
+                  <polygon points="135,218 142,135 135,145 128,135" fill="#222" stroke="#555" stroke-width="1"/>
+                  <!-- Centre -->
+                  <circle cx="135" cy="135" r="8" fill="#111" stroke="#e53e3e" stroke-width="2"/>
+                  <circle cx="135" cy="135" r="3" fill="#e53e3e"/>
+                </g>
+                <!-- Anneau interne déco -->
+                <circle cx="135" cy="135" r="45" fill="none" stroke="#333" stroke-width="1"/>
               </svg>
             </div>
           </div>
@@ -1207,8 +1261,10 @@ function syncCfg(){
   document.getElementById("cfg-duration").value=cfg.duration||120;
   document.getElementById("cfg-nbpostes").value=cfg.nbPostes||10;
   document.getElementById("cfg-siteurl").value=cfg.siteUrl||"https://sampey33.github.io/COPA/";
-  document.getElementById("cfg-theme").value=cfg.theme||"militaire";
+  var theme=cfg.theme||"enfant";
+  document.getElementById("cfg-theme").value=theme;
   document.getElementById("custom-rules-input").value=currentCourse.customRules||"";
+  applyTheme(theme);
 }
 function updateFormMax(){
   var nb=(currentCourse&&currentCourse.cfg)?currentCourse.cfg.nbPostes||10:10;
@@ -1803,7 +1859,7 @@ window.doLogin=async function(){
     document.getElementById("p-timer").textContent=fmtTime((cfg.duration||120)*60);
     window._pCfg=cfg;
     /* Appliquer le thème */
-    applyTheme(cfg.theme||"militaire");
+    applyTheme(cfg.theme||"enfant");
     document.getElementById("s-login").style.display="none";
     document.getElementById("s-scan").style.display="block";
     document.getElementById("scan-name-disp").textContent=j.pseudo;
@@ -1889,25 +1945,28 @@ async function saveTraceAndCleanGPS(){
 
 /* ── THEME ── */
 function applyTheme(theme){
-  document.body.classList.remove("theme-entreprise","theme-enfant");
+  document.body.classList.remove("theme-militaire","theme-entreprise","theme-enfant");
   var s=document.body.style;
-  /* Réinitialiser les variables au thème militaire par défaut */
   var vars={
-    militaire:{"--bg":"#1a1c16","--bg2":"#22251c","--bg3":"#2a2e22","--text":"#d4cdb0","--dim":"#7a7560","--border":"#363a2c","--olive":"#4a5240","--olive-dark":"#2e3328","--khaki":"#8b8b5a","--sand":"#c8b882"},
-    entreprise:{"--bg":"#f5f8fa","--bg2":"#ffffff","--bg3":"#eaf1f5","--text":"#1e2d3a","--dim":"#7a9ab0","--border":"#c8dce8","--olive":"#5a7d9a","--olive-dark":"#3d5a73","--khaki":"#7aadcc","--sand":"#a0c8e0"},
-    enfant:{"--bg":"#f0faf8","--bg2":"#ffffff","--bg3":"#e6f4f1","--text":"#1a3a35","--dim":"#5a8f88","--border":"#b2ddd6","--olive":"#4a9b8e","--olive-dark":"#2d7a6e","--khaki":"#5ba8c4","--sand":"#7ec8e3"}
+    enfant:{"--bg":"#f0faf8","--bg2":"#ffffff","--bg3":"#e6f4f1","--text":"#1a3a35","--dim":"#5a8f88","--border":"#b2ddd6","--olive":"#4a9b8e","--olive-dark":"#2d7a6e","--khaki":"#5ba8c4","--sand":"#7ec8e3"},
+    militaire:{"--bg":"#1a1c16","--bg2":"#22251c","--bg3":"#2a2e22","--text":"#d4cdb0","--dim":"#7a7560","--border":"#363a2c","--olive":"#4a5240","--olive-dark":"#2e3328","--khaki":"#8b8b5a","--sand":"#c8b882"}
   };
-  var v=vars[theme]||vars.militaire;
+  var v=vars[theme]||vars.enfant;
   Object.keys(v).forEach(function(k){ s.setProperty(k,v[k]); });
-  if(theme==="entreprise") document.body.classList.add("theme-entreprise");
-  if(theme==="enfant")     document.body.classList.add("theme-enfant");
+  if(theme==="militaire") document.body.classList.add("theme-militaire");
+  /* Switcher la boussole */
+  var def=document.getElementById("compass-default");
+  var silva=document.getElementById("compass-silva");
+  if(def&&silva){
+    if(theme==="militaire"){ def.style.display="none"; silva.style.display="block"; }
+    else { def.style.display="block"; silva.style.display="none"; }
+  }
   /* Textes adaptés selon le thème */
   var labels={
-    militaire:{balise:"BALISE",poste:"POSTE",distance:"DISTANCE",valider:"VALIDER LE CODE",scan:"Scannez votre QR code",sub:"ou saisissez votre code de course et pseudo"},
-    entreprise:{balise:"ÉTAPE",poste:"ÉTAPE",distance:"DISTANCE",valider:"VALIDER LE CODE",scan:"Scannez votre QR code",sub:"ou saisissez votre code de parcours et prénom"},
-    enfant:{balise:"BALISE 🎯",poste:"BALISE",distance:"TU ES À",valider:"J'AI TROUVÉ ! 🎉",scan:"Scanne ton QR code ! 📱",sub:"ou demande le code à ton animateur"}
+    enfant:{scan:"Scanne ton QR code ! 📱",sub:"ou demande le code à ton animateur",valider:"J'AI TROUVÉ ! 🎉"},
+    militaire:{scan:"Scannez votre QR code",sub:"ou saisissez votre code de course et pseudo",valider:"VALIDER LE CODE"}
   };
-  var l=labels[theme]||labels.militaire;
+  var l=labels[theme]||labels.enfant;
   var els={"scan-title":l.scan,"scan-sub":l.sub,"p-validate-btn":l.valider};
   Object.keys(els).forEach(function(id){
     var el=document.getElementById(id);
@@ -1975,20 +2034,17 @@ function updateArrow(){
   if(!pJoueur||lastUserLat===null)return;
   var next=getNext(pJoueur,pPostes);if(!next||!next.lat||!next.lng)return;
   var bearing=getBearing(lastUserLat,lastUserLng,next.lat,next.lng);
-  var rotation;
-  if(deviceHeading!==null){
-    /* bearing = direction absolue vers la cible (0=Nord)
-       deviceHeading = direction vers laquelle pointe le haut du tel (0=Nord)
-       rotation = angle a appliquer a la fleche pour qu'elle pointe vers la cible */
-    rotation = bearing - deviceHeading;
-  } else {
-    /* Pas de capteur : fleche pointe vers le Nord absolu */
-    rotation = bearing;
-  }
-  /* Normaliser entre -180 et 180 pour une rotation fluide */
-  rotation = ((rotation % 360) + 360) % 360;
-  var wrap=document.getElementById("nav-arrow-wrap");
-  if(wrap)wrap.style.transform="rotate("+rotation+"deg)";
+  var roseRot = deviceHeading!==null ? -deviceHeading : 0;
+  /* Boussole défaut */
+  var arrow=document.getElementById("nav-arrow-wrap");
+  var rose=document.getElementById("nav-rose");
+  if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
+  if(rose)  rose.style.transform="rotate("+((roseRot+360)%360)+"deg)";
+  /* Boussole Silva (militaire) */
+  var silvaArrow=document.getElementById("silva-arrow");
+  var silvaRose=document.getElementById("silva-rose");
+  if(silvaArrow) silvaArrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
+  if(silvaRose)  silvaRose.style.transform="rotate("+((roseRot+360)%360)+"deg)";
 }
 function haversine(lat1,lng1,lat2,lng2){var R=6371000;var dLat=(lat2-lat1)*Math.PI/180;var dLng=(lng2-lng1)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function getBearing(lat1,lng1,lat2,lng2){var dLng=(lng2-lng1)*Math.PI/180;var y=Math.sin(dLng)*Math.cos(lat2*Math.PI/180);var x=Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180)-Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLng);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
