@@ -1238,10 +1238,11 @@ window.saveConfig=async function(){
   var d=parseInt(document.getElementById("cfg-duration").value); if(d)cfg.duration=d;
   var nb=parseInt(document.getElementById("cfg-nbpostes").value); if(nb&&nb>=2)cfg.nbPostes=nb;
   var s=document.getElementById("cfg-siteurl").value.trim(); if(s)cfg.siteUrl=s;
-  var th=document.getElementById("cfg-theme").value; cfg.theme=th||"militaire";
+  var th=document.getElementById("cfg-theme").value; cfg.theme=th||"enfant";
   currentCourse.cfg=cfg;
   await fbSet(rCourse(currentUser.uid,currentCourse.id),currentCourse);
   buildRotationSelect(); updateFormMax();
+  applyTheme(th||"enfant");
   alert("Configuration enregistree.");
 };
 
@@ -1944,7 +1945,7 @@ async function saveTraceAndCleanGPS(){
 }
 
 /* ── THEME ── */
-function applyTheme(theme){
+window.applyTheme=function applyTheme(theme){
   document.body.classList.remove("theme-militaire","theme-entreprise","theme-enfant");
   var s=document.body.style;
   var vars={
