@@ -368,9 +368,8 @@ select option{background:var(--bg3)}
           <input type="number" id="cfg-nbpostes" min="2" max="30">
           <label>Thème de l'interface participant</label>
           <select id="cfg-theme" onchange="applyTheme(this.value)">
-            <option value="militaire">🎖️ Militaire (défaut)</option>
+            <option value="militaire">🎖️ Militaire</option>
             <option value="entreprise">💼 Entreprise</option>
-            <option value="enfant">🎨 Enfant</option>
           </select>
           <label>URL du site (pour les QR codes)</label>
           <input id="cfg-siteurl" placeholder="https://sampey33.github.io/COPA/">
@@ -465,71 +464,19 @@ select option{background:var(--bg3)}
         <div class="compass-wrap">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Prochain poste</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900;color:var(--sand);margin-bottom:18px" id="nav-name">-</div>
-          <div style="position:relative;width:270px;height:270px;margin:0 auto 18px" id="compass-container">
-
-            <!-- BOUSSOLE DEFAUT (enfant/coloré) -->
-            <div id="compass-default" style="position:absolute;inset:0">
-              <div style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--border);background:var(--bg3)"></div>
-              <div id="nav-rose" style="position:absolute;inset:0;transition:transform .3s ease">
-                <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--khaki);font-weight:700">N</div>
-                <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">S</div>
-                <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">O</div>
-                <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">E</div>
-              </div>
-              <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
-                <svg width="130" height="130" viewBox="0 0 80 80">
-                  <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882"/>
-                  <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c"/>
-                  <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
-                </svg>
-              </div>
+          <div style="position:relative;width:260px;height:260px;margin:0 auto 18px">
+            <div style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--border);background:var(--bg3)"></div>
+            <div id="nav-rose" style="position:absolute;inset:0;transition:transform .3s ease">
+              <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--khaki);font-weight:700">N</div>
+              <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">S</div>
+              <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">O</div>
+              <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--dim)">E</div>
             </div>
-
-            <!-- BOUSSOLE SILVA (thème militaire) -->
-            <div id="compass-silva" style="position:absolute;inset:0;display:none">
-              <svg id="silva-svg" viewBox="0 0 270 270" width="270" height="270">
-                <!-- Fond noir -->
-                <circle cx="135" cy="135" r="130" fill="#111" stroke="#333" stroke-width="3"/>
-                <!-- Anneau externe graduations -->
-                <circle cx="135" cy="135" r="120" fill="none" stroke="#555" stroke-width="1"/>
-                <!-- Graduations tous les 10° -->
-                <g id="silva-ticks" stroke="#888" stroke-width="1"></g>
-                <!-- Graduations majeures tous les 30° -->
-                <g id="silva-ticks-major" stroke="#ccc" stroke-width="2"></g>
-                <!-- Rose qui tourne -->
-                <g id="silva-rose" style="transform-origin:135px 135px;transform:rotate(0deg);transition:transform .3s ease">
-                  <!-- N rouge -->
-                  <text x="135" y="28" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="#e53e3e">N</text>
-                  <!-- S blanc -->
-                  <text x="135" y="252" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">S</text>
-                  <!-- E blanc -->
-                  <text x="252" y="140" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">E</text>
-                  <!-- W blanc -->
-                  <text x="18" y="140" text-anchor="middle" font-family="monospace" font-size="14" fill="#ccc">W</text>
-                  <!-- NE NW SE SW -->
-                  <text x="222" y="58" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">NE</text>
-                  <text x="48" y="58" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">NW</text>
-                  <text x="222" y="222" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">SE</text>
-                  <text x="48" y="222" text-anchor="middle" font-family="monospace" font-size="11" fill="#777">SW</text>
-                  <!-- Ligne Nord rouge -->
-                  <line x1="135" y1="42" x2="135" y2="70" stroke="#e53e3e" stroke-width="2.5"/>
-                  <!-- Ligne Sud -->
-                  <line x1="135" y1="200" x2="135" y2="228" stroke="#555" stroke-width="1.5"/>
-                  <line x1="42" y1="135" x2="70" y2="135" stroke="#555" stroke-width="1.5"/>
-                  <line x1="200" y1="135" x2="228" y2="135" stroke="#555" stroke-width="1.5"/>
-                </g>
-                <!-- Aiguille qui tourne vers la cible -->
-                <g id="silva-arrow" style="transform-origin:135px 135px;transform:rotate(0deg);transition:transform .5s ease">
-                  <!-- Moitié Nord rouge -->
-                  <polygon points="135,52 142,135 135,125 128,135" fill="#e53e3e"/>
-                  <!-- Moitié Sud noire -->
-                  <polygon points="135,218 142,135 135,145 128,135" fill="#222" stroke="#555" stroke-width="1"/>
-                  <!-- Centre -->
-                  <circle cx="135" cy="135" r="8" fill="#111" stroke="#e53e3e" stroke-width="2"/>
-                  <circle cx="135" cy="135" r="3" fill="#e53e3e"/>
-                </g>
-                <!-- Anneau interne déco -->
-                <circle cx="135" cy="135" r="45" fill="none" stroke="#333" stroke-width="1"/>
+            <div id="nav-arrow-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .5s ease">
+              <svg width="130" height="130" viewBox="0 0 80 80">
+                <polygon points="40,8 52,52 40,44 28,52" fill="#c8b882"/>
+                <polygon points="40,72 52,44 40,52 28,44" fill="#363a2c"/>
+                <circle cx="40" cy="40" r="5" fill="var(--olive-dark)" stroke="#c8b882" stroke-width="2"/>
               </svg>
             </div>
           </div>
@@ -2035,17 +1982,18 @@ function updateArrow(){
   if(!pJoueur||lastUserLat===null)return;
   var next=getNext(pJoueur,pPostes);if(!next||!next.lat||!next.lng)return;
   var bearing=getBearing(lastUserLat,lastUserLng,next.lat,next.lng);
-  var roseRot = deviceHeading!==null ? -deviceHeading : 0;
-  /* Boussole défaut */
   var arrow=document.getElementById("nav-arrow-wrap");
   var rose=document.getElementById("nav-rose");
-  if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
-  if(rose)  rose.style.transform="rotate("+((roseRot+360)%360)+"deg)";
-  /* Boussole Silva (militaire) */
-  var silvaArrow=document.getElementById("silva-arrow");
-  var silvaRose=document.getElementById("silva-rose");
-  if(silvaArrow) silvaArrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
-  if(silvaRose)  silvaRose.style.transform="rotate("+((roseRot+360)%360)+"deg)";
+  if(deviceHeading!==null){
+    /* La rose tourne dans le sens inverse du téléphone (N reste aligné avec le vrai Nord) */
+    /* La flèche = bearing absolu (pointe vers la cible dans le repère monde) */
+    if(rose)  rose.style.transform="rotate("+((-deviceHeading+360)%360)+"deg)";
+    if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
+  } else {
+    /* Pas de capteur : flèche = bearing, rose fixe */
+    if(rose)  rose.style.transform="rotate(0deg)";
+    if(arrow) arrow.style.transform="rotate("+((bearing+360)%360)+"deg)";
+  }
 }
 function haversine(lat1,lng1,lat2,lng2){var R=6371000;var dLat=(lat2-lat1)*Math.PI/180;var dLng=(lng2-lng1)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function getBearing(lat1,lng1,lat2,lng2){var dLng=(lng2-lng1)*Math.PI/180;var y=Math.sin(dLng)*Math.cos(lat2*Math.PI/180);var x=Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180)-Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLng);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
